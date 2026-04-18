@@ -1515,6 +1515,7 @@ async function selectComposition(id) {
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <div style="font-size:11px;letter-spacing:0.18em;color:var(--accent);font-weight:800;text-transform:uppercase">Parameters</div>
       <div style="display:flex;gap:6px">
+        <button class="btn" id="forkBtn" title="Duplicate this composition with a new id">⎘ Fork</button>
         <button class="btn" id="saveVariantBtn">💾 Save Variant</button>
         <button class="btn primary" id="renderBtn">▶ Render</button>
       </div>
@@ -1551,6 +1552,8 @@ async function selectComposition(id) {
   document.getElementById('renderBtn').addEventListener('click', () => triggerRender(comp));
   const saveBtn = document.getElementById('saveVariantBtn');
   if (saveBtn) saveBtn.addEventListener('click', () => saveCurrentVariant(comp));
+  const forkBtn = document.getElementById('forkBtn');
+  if (forkBtn) forkBtn.addEventListener('click', () => forkComposition(comp));
 
   // Live preview: when the form changes in Live Studio mode, push the new
   // values into Root.tsx's defaultProps for this composition. Remotion
@@ -1829,6 +1832,27 @@ function collectPropsFromForm() {
     props[key] = v;
   });
   return props;
+}
+
+async function forkComposition(comp) {
+  const suggested = (comp.id || '') + '-Copy';
+  const newId = prompt('New composition id:', suggested);
+  if (!newId) return;
+  try {
+    const res = await fetch(`/api/compositions/${encodeURIComponent(comp.id)}/fork`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ newId })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'fork failed');
+    await loadCompositions();
+    alert(`Forked → ${data.id}`);
+    const forked = state.compositions.find(c => c.id === data.id);
+    if (forked) showCompositionDetail(forked);
+  } catch (err) {
+    alert('Fork failed: ' + err.message);
+  }
 }
 
 async function triggerRender(comp) {

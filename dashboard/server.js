@@ -21,6 +21,7 @@ const compilePlan = require('./lib/compile-plan');
 const cleanup = require('./lib/cleanup');
 const schemasDb = require('./lib/schemas');
 const liveProps = require('./lib/live-props');
+const fork = require('./lib/fork');
 const IMAGES_DIR = path.join(__dirname, 'data', 'images');
 const REMOTION_IMAGES_DIR = path.join(__dirname, '..', 'public', 'images');
 const AUDIO_DIR = path.join(__dirname, 'data', 'audio');
@@ -51,6 +52,22 @@ const server = http.createServer((req, res) => {
     const compId = decodeURIComponent(pathname.replace('/api/schemas/', ''));
     const schema = schemasDb.get(compId);
     return send(res, 200, schema || {});
+  }
+
+  // Fork a composition — duplicate its registration with a new id so you
+  // can tweak defaults/variants independently of the original.
+  if (/^\/api\/compositions\/[^/]+\/fork$/.test(pathname) && req.method === 'POST') {
+    const sourceId = decodeURIComponent(pathname.split('/')[3]);
+    return readBody(req, (body) => {
+      try {
+        const { newId } = JSON.parse(body || '{}');
+        if (!newId) return send(res, 400, { error: 'newId required' });
+        const result = fork.forkComposition({ sourceId, newId });
+        send(res, 200, { ok: true, id: result.id });
+      } catch (err) {
+        send(res, 400, { error: err.message });
+      }
+    });
   }
 
   // Live-preview prop writer: update defaultProps for <Composition id="X" />
