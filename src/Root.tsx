@@ -47,6 +47,7 @@ import { PaperclipTest } from "./PaperclipTest";
 import { PaperclipTest2 } from "./PaperclipTest2";
 import { Opus47PaperclipIntro } from "./Opus47PaperclipIntro";
 import { BlockCompositions } from "./blocks/register";
+import { ScriptRunner } from "./ScriptRunner";
 
 
 
@@ -159,6 +160,7 @@ import { __ImportedComp as __IC_Newsub5 } from "./imports/Newsub5";
 import { __ImportedComp as __IC_Revenue } from "./imports/Revenue";
 
 
+
 export const RemotionRoot: React.FC = () => {
   return (
     <>
@@ -251,15 +253,15 @@ export const RemotionRoot: React.FC = () => {
         width={1920}
         height={1080}
         defaultProps={{
-          "word1": "hello",
+          "word1": "Bold",
           "word2": "Loud",
           "word3": "Unmissable",
           "word4": "Motion",
           "word5": "",
           "accentEvery": 3,
           "pulseBackground": true,
-          "fontSize": 220,
-          "textColor": "#583b63",
+          "fontSize": 240,
+          "textColor": "#451111",
           "accentColor": "#f59e0b",
           "backgroundColor": "#09090b"
         }}
@@ -1079,6 +1081,20 @@ export const RemotionRoot: React.FC = () => {
         height={1080}
       />
       <BlockCompositions />
+      <Composition
+        id="ScriptRunner"
+        component={ScriptRunner}
+        fps={30}
+        width={1920}
+        height={1080}
+        durationInFrames={150}
+        defaultProps={{ scenes: [], fontSize: 140, textColor: '#ffffff', bgColors: ['#0f172a', '#1e293b'] }}
+        calculateMetadata={({ props }) => {
+          const scenes = (props as { scenes?: Array<{ durationInFrames: number }> }).scenes || [];
+          const total = scenes.reduce((s, sc) => s + (sc.durationInFrames || 0), 0);
+          return { durationInFrames: Math.max(30, total) };
+        }}
+      />
     </>
   );
 };

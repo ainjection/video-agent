@@ -29,8 +29,64 @@ async function init() {
   wireAIGenerate();
   wireAIStudio();
   wireCleanup();
+  wireScriptToVideo();
   pollThumbnails();
   checkSetup();
+}
+
+function wireScriptToVideo() {
+  const btn = document.getElementById('scriptBuildBtn');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    const script = document.getElementById('scriptInput').value.trim();
+    if (script.length < 20) return alert('Script too short — paste at least a few sentences.');
+    const body = {
+      script,
+      voiceId: document.getElementById('scriptVoice').value.trim() || undefined,
+      fontSize: parseInt(document.getElementById('scriptFontSize').value, 10) || 140,
+      textColor: document.getElementById('scriptTextColor').value,
+      bgColors: [document.getElementById('scriptBg1').value, document.getElementById('scriptBg2').value]
+    };
+    const panel = document.getElementById('scriptProgress');
+    const result = document.getElementById('scriptResult');
+    panel.style.display = 'block';
+    document.getElementById('scriptProgressLabel').textContent = 'Voiceover in progress…';
+    document.getElementById('scriptProgressFill').style.width = '10%';
+    document.getElementById('scriptProgressPct').textContent = '10%';
+    document.getElementById('scriptProgressLine').textContent = 'Transcribing sentences…';
+    result.innerHTML = '';
+    btn.disabled = true;
+    try {
+      const res = await fetch('/api/script/build', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'build failed');
+      document.getElementById('scriptProgressLabel').textContent = `Rendering ${data.scenes.length} scenes…`;
+      document.getElementById('scriptProgressLine').textContent = `Total: ${(data.totalFrames / 30).toFixed(1)}s · Render ${data.render.id}`;
+      const es = new EventSource(`/api/renders/${data.render.id}/stream`);
+      es.onmessage = (evt) => {
+        const d = JSON.parse(evt.data);
+        document.getElementById('scriptProgressFill').style.width = (d.progress || 0) + '%';
+        document.getElementById('scriptProgressPct').textContent = (d.progress || 0) + '%';
+        if (d.line) document.getElementById('scriptProgressLine').textContent = d.line;
+        if (d.status === 'done') {
+          es.close();
+          result.innerHTML = `<video src="/out/${encodeURIComponent(data.render.filename)}" controls autoplay style="width:100%;border-radius:8px;background:#000;margin-top:12px"></video>`;
+          btn.disabled = false;
+        } else if (d.status === 'failed') {
+          es.close();
+          result.innerHTML = `<div style="padding:12px;background:rgba(239,68,68,0.1);border:1px solid #ef4444;border-radius:6px;color:#ef4444;font-family:monospace;font-size:12px">${escapeHtml(d.error || d.line || 'failed')}</div>`;
+          btn.disabled = false;
+        }
+      };
+    } catch (err) {
+      document.getElementById('scriptProgressLine').textContent = '✗ ' + err.message;
+      btn.disabled = false;
+    }
+  });
 }
 
 async function checkSetup() {

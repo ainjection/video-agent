@@ -26,6 +26,7 @@ const setup = require('./lib/setup');
 const aiThumbnail = require('./lib/ai-thumbnail');
 const uploadBlotato = require('./lib/upload-blotato');
 const subtitles = require('./lib/subtitles');
+const scriptToVideo = require('./lib/script-to-video');
 const IMAGES_DIR = path.join(__dirname, 'data', 'images');
 const REMOTION_IMAGES_DIR = path.join(__dirname, '..', 'public', 'images');
 const AUDIO_DIR = path.join(__dirname, 'data', 'audio');
@@ -71,6 +72,30 @@ const server = http.createServer((req, res) => {
         send(res, 200, status);
       } catch (err) {
         send(res, 400, { error: err.message });
+      }
+    });
+  }
+
+  // Script-to-video: sentence-by-sentence VO + block scenes → render.
+  if (pathname === '/api/script/build' && req.method === 'POST') {
+    return readBody(req, async (body) => {
+      try {
+        const { script, voiceId, fontSize, textColor, bgColors } = JSON.parse(body || '{}');
+        if (!script || script.trim().length < 20) return send(res, 400, { error: 'script too short' });
+        const built = await scriptToVideo.buildScenes({ script, voiceId });
+        const render = renderer.startRender({
+          compositionId: 'ScriptRunner',
+          props: {
+            scenes: built.scenes,
+            fontSize: fontSize || 140,
+            textColor: textColor || '#ffffff',
+            bgColors: bgColors || ['#0f172a', '#1e293b']
+          },
+          label: `Script: ${built.scenes[0].text.slice(0, 40)}…`
+        });
+        send(res, 200, { ok: true, runId: built.runId, scenes: built.scenes, totalFrames: built.totalFrames, render });
+      } catch (err) {
+        send(res, 500, { error: err.message });
       }
     });
   }
