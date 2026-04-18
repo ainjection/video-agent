@@ -5,6 +5,7 @@ const path = require('path');
 
 const SRC_DIR = path.join(__dirname, '..', '..', 'src');
 const ROOT_FILE = path.join(SRC_DIR, 'Root.tsx');
+const REGISTER_FILE = path.join(SRC_DIR, 'blocks', 'register.tsx');
 
 function listCompositions() {
   const root = fs.readFileSync(ROOT_FILE, 'utf8');
@@ -27,7 +28,48 @@ function listCompositions() {
     };
     if (comp.id) compositions.push(comp);
   }
+  // Auto-pull blocks registered via <BlockCompositions /> — they live in
+  // src/blocks/register.tsx as a BLOCKS array, not as literal <Composition>
+  // tags, so the regex above won't see them.
+  compositions.push(...listBlockCompositions());
   return compositions;
+}
+
+function listBlockCompositions() {
+  if (!fs.existsSync(REGISTER_FILE)) return [];
+  const src = fs.readFileSync(REGISTER_FILE, 'utf8');
+  const out = [];
+  // Grab each entry: { id: 'Block-X', component: X, defaultProps: { … } }
+  const entryRe = /\{\s*id:\s*['"]([^'"]+)['"]\s*,\s*component:\s*(\w+)\s*,\s*defaultProps:/g;
+  let em;
+  while ((em = entryRe.exec(src)) !== null) {
+    const id = em[1];
+    const component = em[2];
+    // Extract the defaultProps object that follows the match — find the first
+    // `{` after the cursor and walk balanced braces.
+    const startKey = src.indexOf('defaultProps:', em.index);
+    const firstBrace = src.indexOf('{', startKey + 'defaultProps:'.length);
+    let depth = 1;
+    let end = firstBrace;
+    for (let j = firstBrace + 1; j < src.length; j++) {
+      const ch = src[j];
+      if (ch === '{') depth++;
+      else if (ch === '}') { depth--; if (depth === 0) { end = j; break; } }
+    }
+    let defaultProps = {};
+    try { defaultProps = jsonLoose(src.substring(firstBrace, end + 1)); } catch {}
+    out.push({
+      id,
+      component,
+      importPath: './blocks',
+      durationInFrames: 90,
+      fps: 30,
+      width: 1920,
+      height: 1080,
+      defaultProps
+    });
+  }
+  return out;
 }
 
 // Scans all `import { A, B } from "./path";` statements and maps each
@@ -101,6 +143,10 @@ function jsonLoose(src) {
   let s = src.trim();
   // Quote unquoted keys: {foo: 1} → {"foo": 1}
   s = s.replace(/([{,]\s*)([A-Za-z_][A-Za-z0-9_]*)\s*:/g, '$1"$2":');
+  // Convert single-quoted strings to double-quoted (handles escaped single quotes)
+  s = s.replace(/'((?:[^'\\]|\\.)*)'/g, (_, body) => {
+    return '"' + body.replace(/"/g, '\\"').replace(/\\'/g, "'") + '"';
+  });
   // Remove trailing commas
   s = s.replace(/,(\s*[}\]])/g, '$1');
   return JSON.parse(s);
