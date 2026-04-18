@@ -10,21 +10,54 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT_FILE = path.join(__dirname, '..', '..', 'src', 'Root.tsx');
+const REGISTER_FILE = path.join(__dirname, '..', '..', 'src', 'blocks', 'register.tsx');
 
 // Serialise writes so a burst of form events doesn't race.
 let writeChain = Promise.resolve();
 
 function updateDefaultProps(compId, newProps) {
   writeChain = writeChain.then(async () => {
+    // Block-* compositions live in register.tsx (BLOCKS array), not Root.tsx.
+    if (compId.startsWith('Block-')) {
+      const code = fs.readFileSync(REGISTER_FILE, 'utf8');
+      const updated = rewriteBlockEntryDefaults(code, compId, newProps);
+      if (updated !== code) fs.writeFileSync(REGISTER_FILE, updated);
+      return;
+    }
     const code = fs.readFileSync(ROOT_FILE, 'utf8');
     const updated = rewriteCompositionDefaults(code, compId, newProps);
-    if (updated !== code) {
-      fs.writeFileSync(ROOT_FILE, updated);
-    }
+    if (updated !== code) fs.writeFileSync(ROOT_FILE, updated);
   }).catch(err => {
     console.warn('[live-props] write failed', err.message);
   });
   return writeChain;
+}
+
+// Rewrite the defaultProps of one entry in register.tsx's BLOCKS array.
+// An entry looks like: { id: 'Block-X', component: X, defaultProps: { ... } }
+function rewriteBlockEntryDefaults(code, compId, newProps) {
+  const idNeedle = `id: '${compId}'`;
+  let idIdx = code.indexOf(idNeedle);
+  if (idIdx === -1) {
+    const altNeedle = `id: "${compId}"`;
+    idIdx = code.indexOf(altNeedle);
+    if (idIdx === -1) throw new Error(`Block "${compId}" not found in register.tsx`);
+  }
+  const dpKey = 'defaultProps:';
+  const dpIdx = code.indexOf(dpKey, idIdx);
+  if (dpIdx === -1) throw new Error(`defaultProps: not found for ${compId}`);
+  const firstBrace = code.indexOf('{', dpIdx + dpKey.length);
+  if (firstBrace === -1) throw new Error(`defaultProps value brace missing for ${compId}`);
+  let depth = 1;
+  let end = firstBrace;
+  for (let j = firstBrace + 1; j < code.length; j++) {
+    const ch = code[j];
+    if (ch === '{') depth++;
+    else if (ch === '}') { depth--; if (depth === 0) { end = j; break; } }
+  }
+  if (depth !== 0) throw new Error('Unbalanced braces in block defaultProps');
+  const json = JSON.stringify(newProps || {}, null, 2).replace(/\n/g, '\n    ');
+  return code.slice(0, firstBrace) + json + code.slice(end + 1);
 }
 
 // Rewrite the `defaultProps={{ ... }}` of a single <Composition id="X" .../>
@@ -108,4 +141,4 @@ function formatPropsExpression(props) {
   return `{${indented}}`;
 }
 
-module.exports = { updateDefaultProps, rewriteCompositionDefaults };
+module.exports = { updateDefaultProps, rewriteCompositionDefaults, rewriteBlockEntryDefaults };
