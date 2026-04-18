@@ -2178,12 +2178,94 @@ async function loadHistory() {
           ${escapeHtml(r.filename || '')} · ${r.createdAt ? new Date(r.createdAt).toLocaleString() : '—'}
         </div>
       </div>
-      <div>
+      <div style="display:flex;gap:8px;align-items:center">
         <span class="history-status status-${r.status}">${r.status}</span>
-        ${r.status === 'done' ? `<a href="/out/${encodeURIComponent(r.filename)}" target="_blank" style="margin-left:10px;color:var(--accent);font-size:11px;text-decoration:none">▶ open</a>` : ''}
+        ${r.status === 'done' ? `<a href="/out/${encodeURIComponent(r.filename)}" target="_blank" style="color:var(--accent);font-size:11px;text-decoration:none">▶ open</a>` : ''}
+        ${r.status === 'done' ? `<button class="btn history-upload-btn" data-filename="${escapeAttr(r.filename)}" data-label="${escapeAttr(r.label || r.compositionId)}" style="padding:3px 8px;font-size:11px">📤 Publish</button>` : ''}
       </div>
     </div>
   `).join('');
+  list.querySelectorAll('.history-upload-btn').forEach(btn => {
+    btn.addEventListener('click', () => showUploadModal(btn.getAttribute('data-filename'), btn.getAttribute('data-label')));
+  });
+}
+
+async function showUploadModal(filename, label) {
+  const existing = document.getElementById('uploadModal');
+  if (existing) existing.remove();
+  const statusRes = await fetch('/api/upload/status');
+  const { configured } = await statusRes.json();
+  if (!configured) {
+    alert('Set BLOTATO_API_KEY in your .env first, then reload the dashboard.');
+    return;
+  }
+
+  let accounts = [];
+  try {
+    const r = await fetch('/api/upload/accounts');
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'could not load accounts');
+    accounts = d.accounts || [];
+  } catch (err) {
+    alert('Blotato accounts failed to load: ' + err.message);
+    return;
+  }
+
+  const modal = document.createElement('div');
+  modal.id = 'uploadModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(6px)';
+  modal.innerHTML = `
+    <div style="background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:28px 32px;width:600px;max-width:90vw">
+      <div style="font-size:11px;letter-spacing:0.2em;color:var(--accent);font-weight:900;margin-bottom:8px">PUBLISH</div>
+      <h2 style="margin:0 0 8px 0;font-size:20px">${escapeHtml(label || filename)}</h2>
+      <p style="color:var(--muted);font-size:12px;margin:0 0 18px 0">Blotato will ingest your MP4 from a public URL. Upload to Drive/S3/ngrok first, then paste the direct URL.</p>
+      <form id="uploadForm" style="display:flex;flex-direction:column;gap:14px">
+        <label style="display:block"><span style="font-size:12px;font-weight:600">Public video URL</span>
+          <input name="publicUrl" type="url" placeholder="https://…/${escapeAttr(filename)}" required style="width:100%;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:12px;margin-top:4px">
+        </label>
+        <label style="display:block"><span style="font-size:12px;font-weight:600">Caption</span>
+          <textarea name="caption" rows="3" placeholder="Post caption…" style="width:100%;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:12px;margin-top:4px"></textarea>
+        </label>
+        <div>
+          <div style="font-size:12px;font-weight:600;margin-bottom:6px">Accounts</div>
+          <div style="display:flex;flex-direction:column;gap:4px;max-height:200px;overflow:auto;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:10px">
+            ${accounts.length ? accounts.map(a => `
+              <label style="display:flex;gap:8px;align-items:center;font-size:12px;cursor:pointer">
+                <input type="checkbox" name="accountIds" value="${escapeAttr(a.id)}">
+                <span>${escapeHtml(a.platform || a.type || '')} · ${escapeHtml(a.username || a.name || a.id)}</span>
+              </label>
+            `).join('') : '<div style="color:var(--muted);font-size:11px">No accounts connected to Blotato yet.</div>'}
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button type="button" id="uploadCancel" class="btn">Cancel</button>
+          <button type="submit" class="btn primary">Publish</button>
+        </div>
+      </form>
+    </div>`;
+  document.body.appendChild(modal);
+  document.getElementById('uploadCancel').onclick = () => modal.remove();
+  document.getElementById('uploadForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const accountIds = fd.getAll('accountIds');
+    const publicUrl = fd.get('publicUrl');
+    const caption = fd.get('caption') || '';
+    if (!accountIds.length) return alert('Pick at least one account.');
+    try {
+      const res = await fetch('/api/upload/post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ publicUrl, accountIds, caption })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'publish failed');
+      alert('✓ Queued to Blotato.');
+      modal.remove();
+    } catch (err) {
+      alert('Publish failed: ' + err.message);
+    }
+  };
 }
 
 // ─── Daily ───────────────────────────────────────────────────────────────────

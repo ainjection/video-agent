@@ -24,6 +24,7 @@ const liveProps = require('./lib/live-props');
 const fork = require('./lib/fork');
 const setup = require('./lib/setup');
 const aiThumbnail = require('./lib/ai-thumbnail');
+const uploadBlotato = require('./lib/upload-blotato');
 const IMAGES_DIR = path.join(__dirname, 'data', 'images');
 const REMOTION_IMAGES_DIR = path.join(__dirname, '..', 'public', 'images');
 const AUDIO_DIR = path.join(__dirname, 'data', 'audio');
@@ -69,6 +70,31 @@ const server = http.createServer((req, res) => {
         send(res, 200, status);
       } catch (err) {
         send(res, 400, { error: err.message });
+      }
+    });
+  }
+
+  // Blotato upload endpoints — list connected accounts and trigger a post
+  // from a completed render file.
+  if (pathname === '/api/upload/status' && req.method === 'GET') {
+    return send(res, 200, { configured: uploadBlotato.hasKey() });
+  }
+  if (pathname === '/api/upload/accounts' && req.method === 'GET') {
+    return uploadBlotato.listAccounts()
+      .then(accounts => send(res, 200, { accounts }))
+      .catch(err => send(res, 500, { error: err.message }));
+  }
+  if (pathname === '/api/upload/post' && req.method === 'POST') {
+    return readBody(req, async (body) => {
+      try {
+        const { publicUrl, accountIds, caption } = JSON.parse(body || '{}');
+        if (!publicUrl) return send(res, 400, { error: 'publicUrl required (upload the MP4 somewhere reachable first)' });
+        if (!Array.isArray(accountIds) || accountIds.length === 0) return send(res, 400, { error: 'accountIds required' });
+        const src = await uploadBlotato.uploadVideo(publicUrl);
+        const post = await uploadBlotato.createPost({ accountIds, caption, videoSourceId: src.id });
+        send(res, 200, { ok: true, source: src, post });
+      } catch (err) {
+        send(res, 500, { error: err.message });
       }
     });
   }
