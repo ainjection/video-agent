@@ -22,6 +22,7 @@ const cleanup = require('./lib/cleanup');
 const schemasDb = require('./lib/schemas');
 const liveProps = require('./lib/live-props');
 const fork = require('./lib/fork');
+const setup = require('./lib/setup');
 const IMAGES_DIR = path.join(__dirname, 'data', 'images');
 const REMOTION_IMAGES_DIR = path.join(__dirname, '..', 'public', 'images');
 const AUDIO_DIR = path.join(__dirname, 'data', 'audio');
@@ -52,6 +53,23 @@ const server = http.createServer((req, res) => {
     const compId = decodeURIComponent(pathname.replace('/api/schemas/', ''));
     const schema = schemasDb.get(compId);
     return send(res, 200, schema || {});
+  }
+
+  // First-run setup: checks which API keys are present, lets the user
+  // paste missing ones directly into a modal — written to .env.
+  if (pathname === '/api/setup/status' && req.method === 'GET') {
+    return send(res, 200, setup.getStatus());
+  }
+  if (pathname === '/api/setup/save' && req.method === 'POST') {
+    return readBody(req, (body) => {
+      try {
+        const updates = JSON.parse(body || '{}');
+        const status = setup.saveKeys(updates);
+        send(res, 200, status);
+      } catch (err) {
+        send(res, 400, { error: err.message });
+      }
+    });
   }
 
   // Fork a composition — duplicate its registration with a new id so you

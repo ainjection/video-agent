@@ -30,6 +30,64 @@ async function init() {
   wireAIStudio();
   wireCleanup();
   pollThumbnails();
+  checkSetup();
+}
+
+async function checkSetup() {
+  try {
+    const res = await fetch('/api/setup/status');
+    const status = await res.json();
+    if (status.complete) return;
+    showSetupModal(status);
+  } catch {}
+}
+
+function showSetupModal(status) {
+  const existing = document.getElementById('setupModal');
+  if (existing) existing.remove();
+  const keys = [
+    { id: 'ANTHROPIC_API_KEY', label: 'Anthropic (Claude)', href: 'https://console.anthropic.com/' },
+    { id: 'GEMINI_API_KEY', label: 'Google Gemini', href: 'https://aistudio.google.com/apikey' },
+    { id: 'ELEVEN_API_KEY', label: 'ElevenLabs (voiceover)', href: 'https://elevenlabs.io/app/settings/api-keys' }
+  ];
+  const modal = document.createElement('div');
+  modal.id = 'setupModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(6px)';
+  modal.innerHTML = `
+    <div style="background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:28px 32px;width:560px;max-width:90vw">
+      <div style="font-size:11px;letter-spacing:0.2em;color:var(--accent);font-weight:900;margin-bottom:8px">WELCOME</div>
+      <h2 style="margin:0 0 16px 0;font-size:22px">Set up your API keys</h2>
+      <p style="color:var(--muted);line-height:1.5;margin:0 0 20px 0">Video Agent needs at least one AI key to do anything useful. These are written to a local <code>.env</code> file (gitignored). Paste what you've got — skip what you haven't, you can add more later.</p>
+      <form id="setupForm" style="display:flex;flex-direction:column;gap:14px">
+        ${keys.map(k => `
+          <label style="display:block">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+              <span style="font-weight:600">${k.label} ${status.present.includes(k.id) ? '<span style="color:var(--accent);font-size:10px;letter-spacing:0.15em">✓ SET</span>' : ''}</span>
+              <a href="${k.href}" target="_blank" style="font-size:11px;color:var(--muted)">get a key →</a>
+            </div>
+            <input name="${k.id}" type="password" placeholder="${status.present.includes(k.id) ? '(already set — leave blank to keep)' : 'paste key'}" style="width:100%;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-family:monospace;font-size:12px">
+          </label>
+        `).join('')}
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+          <button type="button" id="setupSkip" class="btn">Skip for now</button>
+          <button type="submit" class="btn primary">Save</button>
+        </div>
+      </form>
+    </div>`;
+  document.body.appendChild(modal);
+  document.getElementById('setupSkip').onclick = () => modal.remove();
+  document.getElementById('setupForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const updates = {};
+    for (const [k, v] of fd.entries()) if (v) updates[k] = v;
+    try {
+      await fetch('/api/setup/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updates) });
+      modal.remove();
+    } catch (err) {
+      alert('Save failed: ' + err.message);
+    }
+  };
 }
 
 function wireCleanup() {
