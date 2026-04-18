@@ -1,7 +1,7 @@
 // Infer a category tag from a composition id. Returns a short label used for
 // filter chips (and to suggest sensible icon/colour later).
 const RULES = [
-  { match: /^Block_/, category: 'Block' },
+  { match: /^Block-/, category: 'Block' },
   { match: /^Sub|Subscribe/i, category: 'Subscribe' },
   { match: /LowerThird/i, category: 'Lower Third' },
   { match: /Counter/i, category: 'Counter' },
