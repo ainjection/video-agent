@@ -91,3 +91,5 @@ MIT. Do whatever.
 ## Credits
 
 Built on [Remotion](https://www.remotion.dev/). Dashboard is vanilla Node + vanilla JS — no frameworks, no build step.
+
+Animation primitives in `src/blocks/utils.ts` (easing names, frame/second helpers) and the `TextReveal` clip-path pattern were inspired by [trycua/launchpad](https://github.com/trycua/launchpad) (MIT).

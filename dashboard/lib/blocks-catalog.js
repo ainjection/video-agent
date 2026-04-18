@@ -130,5 +130,103 @@ module.exports = {
       accentColor: { type: 'hex', default: '#00e676' },
       bgColor: { type: 'hex', default: '#0a0a0a' }
     }
+  },
+  TextReveal: {
+    category: 'text',
+    description: 'Clip-path mask reveal — text appears by wiping in from an edge. Cleaner than SpinningText for title reveals.',
+    props: {
+      text: { type: 'string', required: true },
+      fontSize: { type: 'number', default: 120 },
+      color: { type: 'hex', default: '#ffffff' },
+      direction: { type: 'left|right|up|down', default: 'left' },
+      durationInFrames: { type: 'number', default: 30 },
+      delay: { type: 'number', default: 0 },
+      easing: { type: 'smooth|bounce|linear|inOut|sharp|elastic', default: 'inOut' },
+      align: { type: 'left|center|right', default: 'center' }
+    }
+  },
+  CodeBlock: {
+    category: 'content',
+    description: 'Static syntax-highlighted code panel (TS/JS/Python-ish). GitHub Dark palette, line numbers optional.',
+    props: {
+      code: { type: 'string (multi-line code)', required: true },
+      language: { type: 'string', default: 'typescript' },
+      fontSize: { type: 'number', default: 28 },
+      width: { type: 'number', default: 1100 },
+      background: { type: 'hex', default: '#0d1117' },
+      showLineNumbers: { type: 'boolean', default: true }
+    }
+  },
+  TypingCode: {
+    category: 'content',
+    description: 'Code typed out character-by-character with a blinking cursor. Great for AI/dev demos.',
+    props: {
+      code: { type: 'string (multi-line code)', required: true },
+      language: { type: 'string', default: 'typescript' },
+      fontSize: { type: 'number', default: 32 },
+      width: { type: 'number', default: 1100 },
+      charsPerSecond: { type: 'number', default: 35 },
+      background: { type: 'hex', default: '#0d1117' },
+      accent: { type: 'hex', default: '#79c0ff' }
+    }
+  },
+  CountUp: {
+    category: 'text',
+    description: 'Animated number that counts from → to with easing. Supports prefix/suffix (e.g. "$", "%").',
+    props: {
+      from: { type: 'number', default: 0 },
+      to: { type: 'number', default: 100 },
+      durationInFrames: { type: 'number', default: 60 },
+      delay: { type: 'number', default: 0 },
+      decimals: { type: 'number', default: 0 },
+      prefix: { type: 'string', default: '' },
+      suffix: { type: 'string', default: '' },
+      fontSize: { type: 'number', default: 200 },
+      color: { type: 'hex', default: '#ffffff' },
+      easing: { type: 'smooth|bounce|linear|inOut|sharp|elastic', default: 'smooth' },
+      align: { type: 'left|center|right', default: 'center' }
+    }
+  },
+  TerminalWindow: {
+    category: 'frame',
+    description: 'macOS-style terminal window with animated typed command output. Complements BrowserWindow.',
+    props: {
+      lines: { type: 'array<string>', default: ['npm install', 'Done.'] },
+      title: { type: 'string', default: 'zsh' },
+      width: { type: 'number', default: 1200 },
+      fontSize: { type: 'number', default: 26 },
+      charsPerSecond: { type: 'number', default: 45 },
+      prompt: { type: 'string', default: '$' },
+      promptColor: { type: 'hex', default: '#00e676' },
+      textColor: { type: 'hex', default: '#e6edf3' },
+      background: { type: 'hex', default: '#0b0d10' }
+    }
+  },
+  WordByWord: {
+    category: 'text',
+    description: 'Headline revealed word-by-word with spring bounce. Every Nth word can be accent-coloured.',
+    props: {
+      text: { type: 'string', required: true },
+      fontSize: { type: 'number', default: 100 },
+      color: { type: 'hex', default: '#ffffff' },
+      accentColor: { type: 'hex', default: '#00e676' },
+      accentEvery: { type: 'number', default: 3 },
+      wordsPerSecond: { type: 'number', default: 2.5 },
+      align: { type: 'left|center|right', default: 'center' }
+    }
+  },
+  BlurIn: {
+    category: 'text',
+    description: 'Text that starts heavily blurred and comes into focus. Cinematic reveal.',
+    props: {
+      text: { type: 'string', required: true },
+      fontSize: { type: 'number', default: 180 },
+      color: { type: 'hex', default: '#ffffff' },
+      startBlur: { type: 'number', default: 40 },
+      durationInFrames: { type: 'number', default: 30 },
+      delay: { type: 'number', default: 0 },
+      easing: { type: 'smooth|bounce|linear|inOut|sharp|elastic', default: 'smooth' },
+      align: { type: 'left|center|right', default: 'center' }
+    }
   }
 };
