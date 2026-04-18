@@ -130,7 +130,7 @@ async function runCleanup(kind) {
 }
 
 // ─── AI Studio ───────────────────────────────────────────────────────────────
-const studioState = { messages: [] };
+const studioState = { messages: [], editTargetCompId: null };
 
 function wireAIStudio() {
   document.getElementById('aistudioInputBar').addEventListener('submit', (e) => {
@@ -145,6 +145,7 @@ function wireAIStudio() {
   });
   document.getElementById('aistudioNew').addEventListener('click', () => {
     studioState.messages = [];
+    studioState.editTargetCompId = null;
     renderStudioChat();
   });
   document.querySelectorAll('.aistudio-example').forEach(btn => {
@@ -205,16 +206,19 @@ async function sendStudioMessage() {
 
 function renderStudioChat() {
   const chatEl = document.getElementById('aistudioChat');
+  const editBanner = studioState.editTargetCompId ? `
+    <div class="aistudio-edit-banner" style="background:rgba(16,185,129,0.12);border:1px solid #10b981;border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;font-size:12px">
+      <span>✎ Editing <b>${escapeHtml(studioState.editTargetCompId)}</b> — previews + saves overwrite the original file.</span>
+      <button onclick="exitStudioEditMode()" style="background:transparent;border:1px solid #10b981;color:#10b981;border-radius:4px;padding:3px 8px;cursor:pointer;font-size:11px">Cancel edit</button>
+    </div>
+  ` : '';
 
   if (!studioState.messages.length) {
-    // Keep the welcome if there are no messages yet — don't wipe it
-    if (!chatEl.querySelector('.aistudio-welcome')) {
-      chatEl.innerHTML = '<div class="aistudio-welcome"><h3>Describe the video you want.</h3><p>Start by typing a brief below.</p></div>';
-    }
+    chatEl.innerHTML = editBanner + '<div class="aistudio-welcome"><h3>Describe the video you want.</h3><p>Start by typing a brief below.</p></div>';
     return;
   }
 
-  chatEl.innerHTML = studioState.messages.map((m, i) => renderStudioMessage(m, i)).join('');
+  chatEl.innerHTML = editBanner + studioState.messages.map((m, i) => renderStudioMessage(m, i)).join('');
   chatEl.scrollTop = chatEl.scrollHeight;
 
   // Wire preview buttons
@@ -248,11 +252,18 @@ function renderStudioMessage(m, idx) {
     <div class="aistudio-preview-panel" id="aistudio-preview-${idx}">
       ${m.previewStatus === 'done' ? `
         <video src="/out/${encodeURIComponent(m.previewFilename)}" controls autoplay></video>
-        <div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;margin-top:10px">
-          <input type="text" placeholder="Name to save to library" id="aistudio-name-${idx}" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:6px;font-size:13px">
-          <button class="btn primary" onclick="studioSavePreview(${idx})">✓ Save</button>
-          <button class="btn danger" onclick="studioDiscardPreview(${idx})">✗ Discard</button>
-        </div>
+        ${studioState.editTargetCompId ? `
+          <div style="display:flex;gap:10px;margin-top:10px">
+            <button class="btn primary" onclick="studioSaveEdit(${idx})">💾 Save to ${escapeHtml(studioState.editTargetCompId)}</button>
+            <button class="btn danger" onclick="studioDiscardPreview(${idx})">✗ Discard</button>
+          </div>
+        ` : `
+          <div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;margin-top:10px">
+            <input type="text" placeholder="Name to save to library" id="aistudio-name-${idx}" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:6px;font-size:13px">
+            <button class="btn primary" onclick="studioSavePreview(${idx})">✓ Save</button>
+            <button class="btn danger" onclick="studioDiscardPreview(${idx})">✗ Discard</button>
+          </div>
+        `}
       ` : `
         <div style="font-family:monospace;font-size:11px;color:var(--muted)">${escapeHtml(m.previewStatus || 'rendering…')}</div>
         <div style="margin-top:6px;height:4px;background:var(--border);border-radius:2px;overflow:hidden">
@@ -1572,7 +1583,8 @@ async function selectComposition(id) {
   formEl.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <div style="font-size:11px;letter-spacing:0.18em;color:var(--accent);font-weight:800;text-transform:uppercase">Parameters</div>
-      <div style="display:flex;gap:6px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn" id="editAiBtn" title="Iterate on this composition's code with AI">🤖 Edit with AI</button>
         <button class="btn" id="aiThumbBtn" title="Generate AI thumbnail with Nano Banana">🎨 AI Thumb</button>
         <button class="btn" id="forkBtn" title="Duplicate this composition with a new id">⎘ Fork</button>
         <button class="btn" id="saveVariantBtn">💾 Save Variant</button>
@@ -1615,6 +1627,8 @@ async function selectComposition(id) {
   if (forkBtn) forkBtn.addEventListener('click', () => forkComposition(comp));
   const aiThumbBtn = document.getElementById('aiThumbBtn');
   if (aiThumbBtn) aiThumbBtn.addEventListener('click', () => generateAiThumbnail(comp));
+  const editAiBtn = document.getElementById('editAiBtn');
+  if (editAiBtn) editAiBtn.addEventListener('click', () => editWithAI(comp));
 
   // Live preview: when the form changes in Live Studio mode, push the new
   // values into Root.tsx's defaultProps for this composition. Remotion
@@ -1893,6 +1907,86 @@ function collectPropsFromForm() {
     props[key] = v;
   });
   return props;
+}
+
+async function editWithAI(comp) {
+  try {
+    const res = await fetch(`/api/compositions/${encodeURIComponent(comp.id)}/source`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'could not fetch source');
+    document.querySelector('.nav-item[data-view="aistudio"]').click();
+    studioState.messages = [{
+      role: 'user',
+      content: `Edit mode — I want to iterate on the composition "${comp.id}" (${data.filePath}).\n\nHere's the current code:\n\n\`\`\`tsx\n${data.code}\n\`\`\`\n\nAsk me what I'd like to change, or propose an obvious improvement.`
+    }];
+    studioState.editTargetCompId = comp.id;
+    renderStudioChat();
+    // Auto-send so the AI replies to the edit context
+    setTimeout(() => sendStudioMessageAuto(), 100);
+  } catch (err) {
+    alert('Edit failed: ' + err.message);
+  }
+}
+
+async function sendStudioMessageAuto() {
+  // Same as sendStudioMessage but without reading the input — used when we
+  // seed the conversation programmatically for edit mode.
+  const sendBtn = document.getElementById('aistudioSend');
+  if (sendBtn) sendBtn.disabled = true;
+  studioState.messages.push({ role: 'assistant', content: '…thinking', pending: true });
+  renderStudioChat();
+  try {
+    const provider = document.getElementById('aistudioProvider')?.value || 'auto';
+    const res = await fetch('/api/ai/studio/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: studioState.messages.filter(m => !m.pending).map(m => ({ role: m.role, content: m.content })),
+        provider
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'chat failed');
+    studioState.messages.pop();
+    studioState.messages.push({
+      role: 'assistant',
+      content: data.reply,
+      code: data.code || null,
+      truncated: !!data.truncated,
+      providerUsed: data.providerUsed
+    });
+    renderStudioChat();
+  } catch (err) {
+    studioState.messages.pop();
+    studioState.messages.push({ role: 'assistant', content: '✗ ' + err.message, error: true });
+    renderStudioChat();
+  } finally {
+    if (sendBtn) sendBtn.disabled = false;
+  }
+}
+
+function exitStudioEditMode() {
+  studioState.editTargetCompId = null;
+  studioState.messages = [];
+  renderStudioChat();
+}
+
+async function studioSaveEdit(idx) {
+  const msg = studioState.messages[idx];
+  if (!msg || !msg.code || !studioState.editTargetCompId) return;
+  if (!confirm(`Overwrite ${studioState.editTargetCompId}'s source file with the new code?`)) return;
+  try {
+    const res = await fetch('/api/ai/studio/save-edit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sourceId: studioState.editTargetCompId, code: msg.code })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'save failed');
+    alert(`✓ Saved to ${data.filePath}. Remotion will hot-reload the composition.`);
+  } catch (err) {
+    alert('Save failed: ' + err.message);
+  }
 }
 
 async function generateAiThumbnail(comp) {

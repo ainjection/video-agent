@@ -73,6 +73,50 @@ const server = http.createServer((req, res) => {
     });
   }
 
+  // Return the source TSX of a composition (used by AI Studio edit mode).
+  if (/^\/api\/compositions\/[^/]+\/source$/.test(pathname) && req.method === 'GET') {
+    const compId = decodeURIComponent(pathname.split('/')[3]);
+    try {
+      const comp = compositions.listCompositions().find(c => c.id === compId);
+      if (!comp) return send(res, 404, { error: 'composition not found' });
+      let filePath;
+      if (compId.startsWith('Block-')) {
+        filePath = path.join(__dirname, '..', 'src', 'blocks', `${comp.component}.tsx`);
+      } else if (comp.importPath) {
+        filePath = path.join(__dirname, '..', 'src', comp.importPath.replace(/^\.\//, '') + '.tsx');
+      }
+      if (!filePath || !fs.existsSync(filePath)) return send(res, 404, { error: 'source file not found' });
+      const code = fs.readFileSync(filePath, 'utf8');
+      return send(res, 200, { code, filePath: path.relative(path.join(__dirname, '..'), filePath), component: comp.component });
+    } catch (err) {
+      return send(res, 500, { error: err.message });
+    }
+  }
+
+  // AI Studio edit-mode save: overwrite the original composition's TSX file
+  // with edited code. compId locates the target file; code is the new TSX.
+  if (pathname === '/api/ai/studio/save-edit' && req.method === 'POST') {
+    return readBody(req, (body) => {
+      try {
+        const { sourceId, code } = JSON.parse(body || '{}');
+        if (!sourceId || !code) return send(res, 400, { error: 'sourceId and code required' });
+        const comp = compositions.listCompositions().find(c => c.id === sourceId);
+        if (!comp) return send(res, 404, { error: 'source composition not found' });
+        let filePath;
+        if (sourceId.startsWith('Block-')) {
+          filePath = path.join(__dirname, '..', 'src', 'blocks', `${comp.component}.tsx`);
+        } else if (comp.importPath) {
+          filePath = path.join(__dirname, '..', 'src', comp.importPath.replace(/^\.\//, '') + '.tsx');
+        }
+        if (!filePath) return send(res, 400, { error: 'no writable source file for this composition' });
+        fs.writeFileSync(filePath, code);
+        send(res, 200, { ok: true, filePath: path.relative(path.join(__dirname, '..'), filePath) });
+      } catch (err) {
+        send(res, 400, { error: err.message });
+      }
+    });
+  }
+
   // AI thumbnail generation via Nano Banana Pro — replaces the auto-
   // generated still frame with a YouTube-style hero image.
   if (/^\/api\/compositions\/[^/]+\/ai-thumbnail$/.test(pathname) && req.method === 'POST') {
