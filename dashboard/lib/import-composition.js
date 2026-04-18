@@ -308,9 +308,14 @@ function patchRootTsx(o) {
 
   // Default vs named import. Default when the pasted file ONLY has
   // `export default X` — otherwise we have a named `export const X`.
+  // Use a file-scoped alias to prevent collisions with other imports that
+  // happen to export the same symbol name (e.g. every preset exports
+  // `__ImportedComp` so we'd shadow each other without aliasing).
+  const fileSlugForAlias = o.filename.replace(/\.tsx$/, '').replace(/[^A-Za-z0-9_]/g, '');
+  const alias = `__IC_${fileSlugForAlias}`;
   const importLine = o.isDefault
-    ? `import ${o.componentName} from "${importPath}";\n`
-    : `import { ${o.componentName} } from "${importPath}";\n`;
+    ? `import ${alias} from "${importPath}";\n`
+    : `import { ${o.componentName} as ${alias} } from "${importPath}";\n`;
   const importRe = /^import\s[\s\S]+?;\s*$/gm;
   let lastEnd = 0;
   let m;
@@ -328,7 +333,7 @@ function patchRootTsx(o) {
       {/* Imported: ${o.compId} */}
       <Composition
         id="${o.compId}"
-        component={${o.componentName}}
+        component={${alias}}
         durationInFrames={${o.durationInFrames}}
         fps={${o.fps}}
         width={${o.width}}

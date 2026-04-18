@@ -202,5 +202,79 @@
       "default": true,
       "group": "Look"
     }
+  },
+  "Bigbooty": {
+    "word1": {
+      "type": "text",
+      "label": "Word 1",
+      "default": "Bold",
+      "group": "Words"
+    },
+    "word2": {
+      "type": "text",
+      "label": "Word 2",
+      "default": "Loud",
+      "group": "Words"
+    },
+    "word3": {
+      "type": "text",
+      "label": "Word 3",
+      "default": "Unmissable",
+      "group": "Words"
+    },
+    "word4": {
+      "type": "text",
+      "label": "Word 4",
+      "default": "Motion",
+      "group": "Words"
+    },
+    "word5": {
+      "type": "text",
+      "label": "Word 5",
+      "default": "",
+      "group": "Words"
+    },
+    "accentEvery": {
+      "type": "number",
+      "label": "Accent Every Nth Word",
+      "default": 3,
+      "group": "Style",
+      "min": 1,
+      "max": 5,
+      "step": 1
+    },
+    "fontSize": {
+      "type": "number",
+      "label": "Font Size",
+      "default": 240,
+      "group": "Typography",
+      "min": 120,
+      "max": 400,
+      "step": 10
+    },
+    "textColor": {
+      "type": "color",
+      "label": "Text Color",
+      "default": "#fafafa",
+      "group": "Colors"
+    },
+    "accentColor": {
+      "type": "color",
+      "label": "Accent Color",
+      "default": "#f59e0b",
+      "group": "Colors"
+    },
+    "backgroundColor": {
+      "type": "color",
+      "label": "Background",
+      "default": "#09090b",
+      "group": "Colors"
+    },
+    "pulseBackground": {
+      "type": "toggle",
+      "label": "Background Pulse",
+      "default": true,
+      "group": "Style"
+    }
   }
 }

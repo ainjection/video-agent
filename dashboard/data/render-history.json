@@ -1,5 +1,63 @@
 [
   {
+    "id": "3291f819",
+    "compositionId": "Bigbooty",
+    "label": "Bigbooty",
+    "filename": "bigbooty-2026-04-18T18-35-49-120Z.mp4",
+    "outPath": "C:\\Users\\clawb\\Desktop\\video-agent\\out\\bigbooty-2026-04-18T18-35-49-120Z.mp4",
+    "props": {
+      "word1": "kiss",
+      "word2": "my ",
+      "word3": "arse ",
+      "word4": "Motion",
+      "word5": "subscribe ",
+      "accentEvery": 3,
+      "pulseBackground": true,
+      "fontSize": 220,
+      "textColor": "#fafafa",
+      "accentColor": "#f59e0b",
+      "backgroundColor": "#09090b"
+    },
+    "status": "done",
+    "progress": 100,
+    "createdAt": 1776537349122,
+    "completedAt": 1776537365967,
+    "extraOutputs": []
+  },
+  {
+    "id": "ac9d9efc",
+    "compositionId": "Preview-9e32d904",
+    "label": "Preview: Preview-9e32d904",
+    "filename": "preview-9e32d904-2026-04-18T18-27-37-258Z.mp4",
+    "outPath": "C:\\Users\\clawb\\Desktop\\video-agent\\out\\preview-9e32d904-2026-04-18T18-27-37-258Z.mp4",
+    "props": {},
+    "status": "done",
+    "progress": 100,
+    "createdAt": 1776536857259,
+    "completedAt": 1776536873596,
+    "extraOutputs": []
+  },
+  {
+    "id": "02702392",
+    "compositionId": "DataChart-Line",
+    "label": "DataChart-Line",
+    "filename": "datachart-line-2026-04-18T18-25-08-859Z.mp4",
+    "outPath": "C:\\Users\\clawb\\Desktop\\video-agent\\out\\datachart-line-2026-04-18T18-25-08-859Z.mp4",
+    "props": {
+      "type": "line",
+      "title": "does my arse look big",
+      "color": "#8b5cf6",
+      "style": "neon",
+      "showValues": true,
+      "showLabels": true
+    },
+    "status": "done",
+    "progress": 100,
+    "createdAt": 1776536708861,
+    "completedAt": 1776536722154,
+    "extraOutputs": []
+  },
+  {
     "id": "bccb186e",
     "compositionId": "DataChart-Line",
     "label": "DataChart-Line",

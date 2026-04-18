@@ -20,6 +20,7 @@ const aiStudio = require('./lib/ai-studio');
 const compilePlan = require('./lib/compile-plan');
 const cleanup = require('./lib/cleanup');
 const schemasDb = require('./lib/schemas');
+const liveProps = require('./lib/live-props');
 const IMAGES_DIR = path.join(__dirname, 'data', 'images');
 const REMOTION_IMAGES_DIR = path.join(__dirname, '..', 'public', 'images');
 const AUDIO_DIR = path.join(__dirname, 'data', 'audio');
@@ -50,6 +51,22 @@ const server = http.createServer((req, res) => {
     const compId = decodeURIComponent(pathname.replace('/api/schemas/', ''));
     const schema = schemasDb.get(compId);
     return send(res, 200, schema || {});
+  }
+
+  // Live-preview prop writer: update defaultProps for <Composition id="X" />
+  // inside Root.tsx so Remotion Studio hot-reloads with the new values.
+  if (/^\/api\/compositions\/[^/]+\/default-props$/.test(pathname) && req.method === 'POST') {
+    const compId = decodeURIComponent(pathname.split('/')[3]);
+    return readBody(req, async (body) => {
+      try {
+        const { props } = JSON.parse(body);
+        if (!props || typeof props !== 'object') return send(res, 400, { error: 'props required' });
+        await liveProps.updateDefaultProps(compId, props);
+        send(res, 200, { ok: true });
+      } catch (err) {
+        send(res, 400, { error: err.message });
+      }
+    });
   }
 
   if (pathname === '/api/compositions' && req.method === 'GET') {

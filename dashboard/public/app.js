@@ -1552,20 +1552,31 @@ async function selectComposition(id) {
   const saveBtn = document.getElementById('saveVariantBtn');
   if (saveBtn) saveBtn.addEventListener('click', () => saveCurrentVariant(comp));
 
-  // Live preview: when the form changes, rebuild the Studio iframe URL with
-  // the new props. Debounced to avoid thrashing on every keystroke.
+  // Live preview: when the form changes in Live Studio mode, push the new
+  // values into Root.tsx's defaultProps for this composition. Remotion
+  // Studio watches the file → hot-reloads → the main preview updates.
+  // Debounced to 400ms so editing a slider doesn't spam disk writes.
   const propsForm = document.getElementById('propsForm');
   if (propsForm) {
     propsForm.addEventListener('input', () => {
+      if (state.previewMode !== 'studio') return;
       clearTimeout(window.__livePropsTimer);
-      window.__livePropsTimer = setTimeout(() => {
-        if (state.previewMode === 'studio') {
-          state.studioProps = collectPropsFromForm();
-          const iframe = document.getElementById('studioIframe');
-          const studioBase = iframe && iframe.src.split('?')[0];
-          if (studioBase) {
-            iframe.src = `${studioBase}?props=${encodeURIComponent(JSON.stringify(state.studioProps))}`;
+      window.__livePropsTimer = setTimeout(async () => {
+        try {
+          const props = collectPropsFromForm();
+          await fetch(`/api/compositions/${encodeURIComponent(comp.id)}/default-props`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ props })
+          });
+          // Briefly flash the preview to indicate live update happened
+          const frame = document.querySelector('#detailPreview .studio-frame-wrap');
+          if (frame) {
+            frame.style.boxShadow = '0 0 0 2px var(--accent)';
+            setTimeout(() => { frame.style.boxShadow = ''; }, 500);
           }
+        } catch (err) {
+          console.warn('[live-props] push failed', err);
         }
       }, 400);
     });

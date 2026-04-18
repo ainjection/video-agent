@@ -111,34 +111,13 @@ import { Component } from "./imports/Subcribeformoreendscene";
 
 
 
-import { __ImportedComp } from "./imports/Boldtext";
-
-import { __ImportedComp } from "./imports/Cooltextmotion";
-
-import { __ImportedComp } from "./imports/Cool2";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import { __ImportedComp as __IC_Boldtext } from "./imports/Boldtext";
+import { __ImportedComp as __IC_Cooltextmotion } from "./imports/Cooltextmotion";
+import { __ImportedComp as __IC_Cool2 } from "./imports/Cool2";
 import IncomeProgressChart from "./imports/Grothchart";
 
 
-import { __ImportedComp } from "./imports/Map";
-
+import { __ImportedComp as __IC_Map } from "./imports/Map";
 import { Trip } from "./imports/Trip";
 
 import { TimelinePreview } from "./imports/TimelinePreview";
@@ -152,17 +131,40 @@ import { HypeReelIntro } from "./imports/Ownthescreen";
 
 import { AIInjectionIntro } from "./imports/Aiinj";
 
-import { __ImportedComp } from "./imports/Cloudyeffect";
-
+import { __ImportedComp as __IC_Cloudyeffect } from "./imports/Cloudyeffect";
+import { __ImportedComp as __IC_Bigbooty } from "./imports/Bigbooty";
 export const RemotionRoot: React.FC = () => {
   return (
     <>
 
       
-      {/* Imported: Cloudyeffect */}
+      
+      {/* Imported: Bigbooty */}
+      <Composition
+        id="Bigbooty"
+        component={__IC_Boldtext}
+        durationInFrames={150}
+        fps={30}
+        width={1920}
+        height={1080}
+        defaultProps={{
+          "word1": "kiss",
+          "word2": "my ",
+          "word3": "arse ",
+          "word4": "Motion",
+          "word5": "subscribe ",
+          "accentEvery": 3,
+          "pulseBackground": true,
+          "fontSize": 220,
+          "textColor": "#872f8e",
+          "accentColor": "#f59e0b",
+          "backgroundColor": "#09090b"
+        }}
+      />
+{/* Imported: Cloudyeffect */}
       <Composition
         id="Cloudyeffect"
-        component={__ImportedComp}
+        component={__IC_Cooltextmotion}
         durationInFrames={150}
         fps={30}
         width={1920}
@@ -212,7 +214,7 @@ export const RemotionRoot: React.FC = () => {
 {/* Imported: Map */}
       <Composition
         id="Map"
-        component={__ImportedComp}
+        component={__IC_Cool2}
         durationInFrames={150}
         fps={30}
         width={1920}
@@ -232,7 +234,7 @@ export const RemotionRoot: React.FC = () => {
 {/* Imported: Cool2 */}
       <Composition
         id="Cool2"
-        component={__ImportedComp}
+        component={__IC_Map}
         durationInFrames={150}
         fps={30}
         width={1920}
@@ -242,7 +244,7 @@ export const RemotionRoot: React.FC = () => {
 {/* Imported: Cooltextmotion */}
       <Composition
         id="Cooltextmotion"
-        component={__ImportedComp}
+        component={__IC_Cloudyeffect}
         durationInFrames={150}
         fps={30}
         width={1920}
@@ -252,7 +254,7 @@ export const RemotionRoot: React.FC = () => {
 {/* Imported: Boldtext */}
       <Composition
         id="Boldtext"
-        component={__ImportedComp}
+        component={__IC_Bigbooty}
         durationInFrames={150}
         fps={30}
         width={1920}
@@ -488,12 +490,12 @@ export const RemotionRoot: React.FC = () => {
         width={1920}
         height={1080}
         defaultProps={{
-          type: "line",
-          title: "Revenue Trend",
-          color: "#8b5cf6",
-          style: "neon",
-          showValues: true,
-          showLabels: true,
+          "type": "line",
+          "title": "does my arse look big",
+          "color": "#8b5cf6",
+          "style": "neon",
+          "showValues": true,
+          "showLabels": true
         }}
       />
       <Composition
