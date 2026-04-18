@@ -23,6 +23,7 @@ const schemasDb = require('./lib/schemas');
 const liveProps = require('./lib/live-props');
 const fork = require('./lib/fork');
 const setup = require('./lib/setup');
+const aiThumbnail = require('./lib/ai-thumbnail');
 const IMAGES_DIR = path.join(__dirname, 'data', 'images');
 const REMOTION_IMAGES_DIR = path.join(__dirname, '..', 'public', 'images');
 const AUDIO_DIR = path.join(__dirname, 'data', 'audio');
@@ -66,6 +67,21 @@ const server = http.createServer((req, res) => {
         const updates = JSON.parse(body || '{}');
         const status = setup.saveKeys(updates);
         send(res, 200, status);
+      } catch (err) {
+        send(res, 400, { error: err.message });
+      }
+    });
+  }
+
+  // AI thumbnail generation via Nano Banana Pro — replaces the auto-
+  // generated still frame with a YouTube-style hero image.
+  if (/^\/api\/compositions\/[^/]+\/ai-thumbnail$/.test(pathname) && req.method === 'POST') {
+    const compId = decodeURIComponent(pathname.split('/')[3]);
+    return readBody(req, async (body) => {
+      try {
+        const { prompt } = JSON.parse(body || '{}');
+        const result = await aiThumbnail.generate({ compId, prompt });
+        send(res, 200, { ok: true, bytes: result.bytes });
       } catch (err) {
         send(res, 400, { error: err.message });
       }

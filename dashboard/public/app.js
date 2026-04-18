@@ -1573,6 +1573,7 @@ async function selectComposition(id) {
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <div style="font-size:11px;letter-spacing:0.18em;color:var(--accent);font-weight:800;text-transform:uppercase">Parameters</div>
       <div style="display:flex;gap:6px">
+        <button class="btn" id="aiThumbBtn" title="Generate AI thumbnail with Nano Banana">🎨 AI Thumb</button>
         <button class="btn" id="forkBtn" title="Duplicate this composition with a new id">⎘ Fork</button>
         <button class="btn" id="saveVariantBtn">💾 Save Variant</button>
         <button class="btn primary" id="renderBtn">▶ Render</button>
@@ -1612,6 +1613,8 @@ async function selectComposition(id) {
   if (saveBtn) saveBtn.addEventListener('click', () => saveCurrentVariant(comp));
   const forkBtn = document.getElementById('forkBtn');
   if (forkBtn) forkBtn.addEventListener('click', () => forkComposition(comp));
+  const aiThumbBtn = document.getElementById('aiThumbBtn');
+  if (aiThumbBtn) aiThumbBtn.addEventListener('click', () => generateAiThumbnail(comp));
 
   // Live preview: when the form changes in Live Studio mode, push the new
   // values into Root.tsx's defaultProps for this composition. Remotion
@@ -1890,6 +1893,33 @@ function collectPropsFromForm() {
     props[key] = v;
   });
   return props;
+}
+
+async function generateAiThumbnail(comp) {
+  const suggestion = `YouTube thumbnail for a video titled "${comp.id}", 16:9 aspect ratio, bold dark background with neon green accents, big high-contrast sans-serif text, cinematic, no faces, no watermarks, text must be legible at small sizes.`;
+  const prompt = window.prompt('Thumbnail prompt (be specific about text, style, colours):', suggestion);
+  if (!prompt) return;
+  const btn = document.getElementById('aiThumbBtn');
+  const original = btn.textContent;
+  btn.textContent = '🎨 Generating…';
+  btn.disabled = true;
+  try {
+    const res = await fetch(`/api/compositions/${encodeURIComponent(comp.id)}/ai-thumbnail`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'thumbnail generation failed');
+    btn.textContent = '✓ Done';
+    const img = document.querySelector('#detailPreview img');
+    if (img) img.src = `/thumbnails/${encodeURIComponent(comp.id)}.png?t=${Date.now()}`;
+    setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 1500);
+  } catch (err) {
+    alert('Thumbnail failed: ' + err.message);
+    btn.textContent = original;
+    btn.disabled = false;
+  }
 }
 
 async function forkComposition(comp) {
