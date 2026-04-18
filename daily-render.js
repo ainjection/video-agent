@@ -17,6 +17,17 @@ const path = require('path');
 const https = require('https');
 const { execSync } = require('child_process');
 
+// Minimal .env loader (no dep)
+try {
+  const envPath = path.join(__dirname, '.env');
+  if (fs.existsSync(envPath)) {
+    for (const line of fs.readFileSync(envPath, 'utf8').split(/\r?\n/)) {
+      const m = line.match(/^([A-Z_][A-Z0-9_]*)\s*=\s*(.*)$/);
+      if (m && !process.env[m[1]]) process.env[m[1]] = m[2].trim();
+    }
+  }
+} catch {}
+
 // ═══════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════
@@ -32,7 +43,7 @@ const CONFIG = {
   dailyConfigFile: path.join(__dirname, 'public', 'daily', 'config.json'),
 
   // ElevenLabs
-  elevenLabsKey: 'eeda2c834fede2667707755b8d19d8f48952a2862f843e1ae1c0e9964cd6e504',
+  elevenLabsKey: process.env.ELEVEN_API_KEY,
   voiceId: 'TX3LPaxmHKxFdv7VOQHJ', // Liam - Energetic, Social Media Creator
   voiceModel: 'eleven_multilingual_v2',
 

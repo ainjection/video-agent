@@ -26,5 +26,26 @@
       "id": "mo4m94ry",
       "createdAt": 1776533628526
     }
+  ],
+  "Bigbooty": [
+    {
+      "name": "z2",
+      "props": {
+        "word1": "hello",
+        "word2": "Loud",
+        "word3": "Unmissable",
+        "word4": "Motion",
+        "word5": "",
+        "accentEvery": 3,
+        "pulseBackground": true,
+        "fontSize": 220,
+        "textColor": "#583b63",
+        "accentColor": "#f59e0b",
+        "backgroundColor": "#09090b"
+      },
+      "updatedAt": 1776542222271,
+      "id": "mo4rdbr3",
+      "createdAt": 1776542222271
+    }
   ]
 }

@@ -46,5 +46,21 @@
       "body": "system-ui, sans-serif",
       "mono": "Menlo, monospace"
     }
+  },
+  {
+    "id": "new-kit-1776542248210",
+    "name": "New Brand Kit",
+    "colors": {
+      "primary": "#00e676",
+      "secondary": "#f59e0b",
+      "accent": "#ffffff",
+      "background": "#0a0a0a",
+      "text": "#ffffff"
+    },
+    "fonts": {
+      "heading": "Arial Black, sans-serif",
+      "body": "Arial, sans-serif",
+      "mono": "Courier New, monospace"
+    }
   }
 ]

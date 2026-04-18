@@ -276,5 +276,136 @@
       "default": true,
       "group": "Style"
     }
+  },
+  "Revenue": {
+    "title": {
+      "type": "text",
+      "label": "Chart Title",
+      "default": "Q4 Revenue by Region",
+      "group": "Header"
+    },
+    "showTitle": {
+      "type": "toggle",
+      "label": "Show Title",
+      "default": true,
+      "group": "Header"
+    },
+    "bar1Label": {
+      "type": "text",
+      "label": "Bar 1 Label",
+      "default": "North America",
+      "group": "Data"
+    },
+    "bar1Value": {
+      "type": "number",
+      "label": "Bar 1 Value",
+      "default": 4200,
+      "group": "Data",
+      "min": 0,
+      "max": 1000000,
+      "step": 1
+    },
+    "bar2Label": {
+      "type": "text",
+      "label": "Bar 2 Label",
+      "default": "Europe",
+      "group": "Data"
+    },
+    "bar2Value": {
+      "type": "number",
+      "label": "Bar 2 Value",
+      "default": 3100,
+      "group": "Data",
+      "min": 0,
+      "max": 1000000,
+      "step": 1
+    },
+    "bar3Label": {
+      "type": "text",
+      "label": "Bar 3 Label",
+      "default": "Asia Pacific",
+      "group": "Data"
+    },
+    "bar3Value": {
+      "type": "number",
+      "label": "Bar 3 Value",
+      "default": 2800,
+      "group": "Data",
+      "min": 0,
+      "max": 1000000,
+      "step": 1
+    },
+    "bar4Label": {
+      "type": "text",
+      "label": "Bar 4 Label",
+      "default": "Latin America",
+      "group": "Data"
+    },
+    "bar4Value": {
+      "type": "number",
+      "label": "Bar 4 Value",
+      "default": 1500,
+      "group": "Data",
+      "min": 0,
+      "max": 1000000,
+      "step": 1
+    },
+    "bar5Label": {
+      "type": "text",
+      "label": "Bar 5 Label",
+      "default": "",
+      "group": "Data"
+    },
+    "bar5Value": {
+      "type": "number",
+      "label": "Bar 5 Value",
+      "default": 0,
+      "group": "Data",
+      "min": 0,
+      "max": 1000000,
+      "step": 1
+    },
+    "valueSuffix": {
+      "type": "text",
+      "label": "Value Suffix",
+      "default": "",
+      "group": "Data"
+    },
+    "showValues": {
+      "type": "toggle",
+      "label": "Show Values",
+      "default": true,
+      "group": "Data"
+    },
+    "barColor": {
+      "type": "color",
+      "label": "Bar Fill",
+      "default": "#f59e0b",
+      "group": "Colors"
+    },
+    "trackColor": {
+      "type": "color",
+      "label": "Track",
+      "default": "#27272a",
+      "group": "Colors"
+    },
+    "textColor": {
+      "type": "color",
+      "label": "Label Color",
+      "default": "#fafafa",
+      "group": "Colors"
+    },
+    "titleColor": {
+      "type": "color",
+      "label": "Title Color",
+      "default": "#ffffff",
+      "group": "Colors"
+    },
+    "backgroundColor": {
+      "type": "color",
+      "label": "Background",
+      "default": "#09090b",
+      "group": "Colors"
+    }
   }
 }

@@ -1,15 +1,13 @@
 import React from 'react';
 import { AbsoluteFill, Sequence } from 'remotion';
-import { HypeReelIntro as HypeReelIntro__1 } from "./Ownthescreen";
-import { AnimatedText as AnimatedText__2 } from "../AnimatedText";
-import { Comparison as Comparison__3 } from "../Comparison";
+import { AnimatedText as AnimatedText__1 } from "../AnimatedText";
 
 export const TimelinePreview: React.FC = () => {
   return (
     <AbsoluteFill>
-      <Sequence from={0} durationInFrames={240}><HypeReelIntro__1 /></Sequence>
-      <Sequence from={240} durationInFrames={90}><AnimatedText__2 {...({"text":"BREAKING NEWS","style":"glitch","backgroundColor":"#0a0a1a","color":"#ffffff","fontSize":80,"fontFamily":"system-ui, sans-serif","position":"center"} as any)} /></Sequence>
-      <Sequence from={330} durationInFrames={90}><Comparison__3 {...({"type":"flip","beforeLabel":"Old Way","afterLabel":"New Way","beforeColor":"#ef4444","afterColor":"#22c55e","style":"labeled"} as any)} /></Sequence>
+      <Sequence from={0} durationInFrames={90}><AnimatedText__1 {...({"text":"BREAKING NEWS","style":"glitch","backgroundColor":"#0a0a1a","color":"#ffffff","fontSize":80,"fontFamily":"system-ui, sans-serif","position":"center"} as any)} /></Sequence>
+      <Sequence from={90} durationInFrames={128}><AnimatedText__1 {...({"text":"Build Faster Ship Smarter","style":"word-by-word","backgroundColor":"#0a0a1a","color":"#ffffff","fontSize":64,"fontFamily":"system-ui, sans-serif","position":"center"} as any)} /></Sequence>
+      <Sequence from={218} durationInFrames={102}><AnimatedText__1 {...({"text":"Welcome to the Future","style":"typewriter","backgroundColor":"#0a0a1a","color":"#ffffff","fontSize":72,"fontFamily":"system-ui, sans-serif","position":"center"} as any)} /></Sequence>
     </AbsoluteFill>
   );
 };

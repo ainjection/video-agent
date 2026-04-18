@@ -133,13 +133,125 @@ import { AIInjectionIntro } from "./imports/Aiinj";
 
 import { __ImportedComp as __IC_Cloudyeffect } from "./imports/Cloudyeffect";
 import { __ImportedComp as __IC_Bigbooty } from "./imports/Bigbooty";
+
+import { __ImportedComp } from "./imports/Claudewave";
+
+import { __ImportedComp } from "./imports/Card1";
+
+import { __ImportedComp } from "./imports/Low3rd";
+
+
+
+
+
+
+
+
+import { SimpleFastPromo as __IC_Demo3 } from "./imports/Demo3";
+
+import { DynamicPromo as __IC_Demo4 } from "./imports/Demo4";
+
+import { __ImportedComp as __IC_Subscibe3 } from "./imports/Subscibe3";
+
+import { __ImportedComp as __IC_Newsub5 } from "./imports/Newsub5";
+
+import { __ImportedComp as __IC_Revenue } from "./imports/Revenue";
+
 export const RemotionRoot: React.FC = () => {
   return (
     <>
 
       
       
-      {/* Imported: Bigbooty */}
+      
+      
+      
+      
+      
+      
+      
+      
+      {/* Imported: Revenue */}
+      <Composition
+        id="Revenue"
+        component={__IC_Revenue}
+        durationInFrames={150}
+        fps={30}
+        width={1920}
+        height={1080}
+        defaultProps={{}}
+      />
+{/* Imported: Newsub5 */}
+      <Composition
+        id="Newsub5"
+        component={__IC_Newsub5}
+        durationInFrames={150}
+        fps={30}
+        width={1920}
+        height={1080}
+        defaultProps={{}}
+      />
+{/* Imported: Subscibe3 */}
+      <Composition
+        id="Subscibe3"
+        component={__IC_Subscibe3}
+        durationInFrames={150}
+        fps={30}
+        width={1920}
+        height={1080}
+        defaultProps={{}}
+      />
+{/* Imported: Demo4 */}
+      <Composition
+        id="Demo4"
+        component={__IC_Demo4}
+        durationInFrames={240}
+        fps={30}
+        width={1920}
+        height={1080}
+        defaultProps={{}}
+      />
+{/* Imported: Demo3 */}
+      <Composition
+        id="Demo3"
+        component={__IC_Demo3}
+        durationInFrames={240}
+        fps={30}
+        width={1920}
+        height={1080}
+        defaultProps={{}}
+      />
+{/* Imported: Low3rd */}
+      <Composition
+        id="Low3rd"
+        component={__ImportedComp}
+        durationInFrames={150}
+        fps={30}
+        width={1920}
+        height={1080}
+        defaultProps={{}}
+      />
+{/* Imported: Card1 */}
+      <Composition
+        id="Card1"
+        component={__ImportedComp}
+        durationInFrames={150}
+        fps={30}
+        width={1920}
+        height={1080}
+        defaultProps={{}}
+      />
+{/* Imported: Claudewave */}
+      <Composition
+        id="Claudewave"
+        component={__ImportedComp}
+        durationInFrames={150}
+        fps={30}
+        width={1920}
+        height={1080}
+        defaultProps={{}}
+      />
+{/* Imported: Bigbooty */}
       <Composition
         id="Bigbooty"
         component={__IC_Boldtext}
@@ -148,15 +260,15 @@ export const RemotionRoot: React.FC = () => {
         width={1920}
         height={1080}
         defaultProps={{
-          "word1": "kiss",
-          "word2": "my ",
-          "word3": "arse ",
+          "word1": "hello",
+          "word2": "Loud",
+          "word3": "Unmissable",
           "word4": "Motion",
-          "word5": "subscribe ",
+          "word5": "",
           "accentEvery": 3,
           "pulseBackground": true,
           "fontSize": 220,
-          "textColor": "#872f8e",
+          "textColor": "#583b63",
           "accentColor": "#f59e0b",
           "backgroundColor": "#09090b"
         }}
@@ -195,7 +307,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="TimelinePreview"
         component={TimelinePreview}
-        durationInFrames={420}
+        durationInFrames={320}
         fps={30}
         width={1920}
         height={1080}

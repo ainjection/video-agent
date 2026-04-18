@@ -18,6 +18,11 @@ public/images
 # Large generated caches
 dashboard/data/thumbnails
 
+# Per-user runtime data (contain absolute paths, not useful in a clone)
+dashboard/data/render-history.json
+dashboard/data/props/
+dashboard/data/timeline-projects.json
+
 # Editor / OS
 .vscode
 *.log

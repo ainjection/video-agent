@@ -8,10 +8,7 @@ function resolveKey(varName) {
 
   const candidates = [
     path.join(__dirname, '..', '.env'),
-    path.join(__dirname, '..', '..', '.env'),
-    'C:/Users/clawb/Desktop/obsidian-engine-review/.env',
-    'C:/Users/clawb/Desktop/videoteach/.env',
-    'C:/Users/clawb/Desktop/automation-os/.env'
+    path.join(__dirname, '..', '..', '.env')
   ];
   const re = new RegExp(varName + '\\s*=\\s*([^\\r\\n]+)');
   for (const p of candidates) {
