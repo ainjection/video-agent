@@ -1788,8 +1788,10 @@ function renderPropInput(key, value) {
     if (isColor) {
       return `<label><span>${escapeHtml(key)}</span>
         <div class="color-row">
-          <input type="color" data-key="${safeKey}" data-type="string" value="${value}">
-          <input type="text" data-key="${safeKey}" data-type="string" value="${escapeAttr(value)}" style="flex:1">
+          <input type="color" data-key="${safeKey}" data-type="string" value="${value}"
+            oninput="this.nextElementSibling.value = this.value">
+          <input type="text" data-key="${safeKey}" data-type="string" value="${escapeAttr(value)}" style="flex:1"
+            oninput="this.previousElementSibling.value = this.value">
         </div></label>`;
     }
     if (value.length > 40) {
