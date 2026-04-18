@@ -76,6 +76,26 @@ const server = http.createServer((req, res) => {
     });
   }
 
+  // Render a short preview clip for every Block-* composition so the
+  // library grid's hover-autoplay has something to show per block.
+  if (pathname === '/api/blocks/render-previews' && req.method === 'POST') {
+    try {
+      const all = compositions.listCompositions().filter(c => c.id.startsWith('Block-'));
+      const started = [];
+      for (const c of all) {
+        const render = renderer.startRender({
+          compositionId: c.id,
+          props: {},
+          label: `Preview: ${c.id}`
+        });
+        started.push({ id: c.id, renderId: render.id });
+      }
+      return send(res, 200, { ok: true, queued: started.length, renders: started });
+    } catch (err) {
+      return send(res, 500, { error: err.message });
+    }
+  }
+
   // Script-to-video: sentence-by-sentence VO + block scenes → render.
   if (pathname === '/api/script/build' && req.method === 'POST') {
     return readBody(req, async (body) => {

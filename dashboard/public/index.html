@@ -219,6 +219,13 @@
             <b>Broken</b> = auto-gen comps whose thumbnail generation failed (likely malformed files).<br>
             <b>All auto-gen</b> = Preview-*, TimelineProject-*, AIGen-*. These are temporary by design — cleaning them is always safe. Your named / saved compositions are never touched.
           </div>
+
+          <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
+            <h3 style="margin:0 0 6px 0;font-size:14px">Block previews</h3>
+            <p class="muted" style="font-size:11px;margin:0 0 10px 0">Render a short MP4 for every Block-* composition so the library grid plays them on hover.</p>
+            <button id="renderBlockPreviews" class="btn primary">🎬 Render all 26 block previews</button>
+            <div id="blockPreviewsStatus" class="muted" style="font-size:11px;margin-top:8px"></div>
+          </div>
         </div>
       </section>
 

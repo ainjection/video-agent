@@ -150,6 +150,29 @@ function wireCleanup() {
   document.getElementById('cleanupRefresh').addEventListener('click', loadCleanupStatus);
   document.getElementById('cleanupBroken').addEventListener('click', () => runCleanup('broken'));
   document.getElementById('cleanupAll').addEventListener('click', () => runCleanup('all-auto'));
+  const blockBtn = document.getElementById('renderBlockPreviews');
+  if (blockBtn) blockBtn.addEventListener('click', renderAllBlockPreviews);
+}
+
+async function renderAllBlockPreviews() {
+  const btn = document.getElementById('renderBlockPreviews');
+  const statusEl = document.getElementById('blockPreviewsStatus');
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '🎬 Queueing…';
+  statusEl.textContent = '';
+  try {
+    const res = await fetch('/api/blocks/render-previews', { method: 'POST' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'render-previews failed');
+    statusEl.textContent = `Queued ${data.queued} block renders. Watch Render History — they\'ll appear as "Preview: Block-X" entries. Once done, the library grid hovers play each block.`;
+    btn.textContent = '✓ Queued';
+    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 3000);
+  } catch (err) {
+    statusEl.textContent = '✗ ' + err.message;
+    btn.textContent = orig;
+    btn.disabled = false;
+  }
 }
 
 async function loadCleanupStatus() {
