@@ -2181,12 +2181,36 @@ async function loadHistory() {
       <div style="display:flex;gap:8px;align-items:center">
         <span class="history-status status-${r.status}">${r.status}</span>
         ${r.status === 'done' ? `<a href="/out/${encodeURIComponent(r.filename)}" target="_blank" style="color:var(--accent);font-size:11px;text-decoration:none">▶ open</a>` : ''}
+        ${r.status === 'done' ? `<button class="btn history-caption-btn" data-filename="${escapeAttr(r.filename)}" style="padding:3px 8px;font-size:11px" title="Transcribe VO and burn subtitles">🔥 Captions</button>` : ''}
         ${r.status === 'done' ? `<button class="btn history-upload-btn" data-filename="${escapeAttr(r.filename)}" data-label="${escapeAttr(r.label || r.compositionId)}" style="padding:3px 8px;font-size:11px">📤 Publish</button>` : ''}
       </div>
     </div>
   `).join('');
   list.querySelectorAll('.history-upload-btn').forEach(btn => {
     btn.addEventListener('click', () => showUploadModal(btn.getAttribute('data-filename'), btn.getAttribute('data-label')));
+  });
+  list.querySelectorAll('.history-caption-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const filename = btn.getAttribute('data-filename');
+      const orig = btn.textContent;
+      btn.textContent = '⏳ Transcribing…';
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/subtitles/burn', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'burn failed');
+        alert(`✓ Captions burned. ${data.wordCount} words. Output: ${data.filename}`);
+      } catch (err) {
+        alert('Captions failed: ' + err.message);
+      } finally {
+        btn.textContent = orig;
+        btn.disabled = false;
+      }
+    });
   });
 }
 

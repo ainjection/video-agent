@@ -25,6 +25,7 @@ const fork = require('./lib/fork');
 const setup = require('./lib/setup');
 const aiThumbnail = require('./lib/ai-thumbnail');
 const uploadBlotato = require('./lib/upload-blotato');
+const subtitles = require('./lib/subtitles');
 const IMAGES_DIR = path.join(__dirname, 'data', 'images');
 const REMOTION_IMAGES_DIR = path.join(__dirname, '..', 'public', 'images');
 const AUDIO_DIR = path.join(__dirname, 'data', 'audio');
@@ -70,6 +71,25 @@ const server = http.createServer((req, res) => {
         send(res, 200, status);
       } catch (err) {
         send(res, 400, { error: err.message });
+      }
+    });
+  }
+
+  // Burn subtitles onto a rendered MP4 via ElevenLabs Scribe + FFmpeg.
+  if (pathname === '/api/subtitles/burn' && req.method === 'POST') {
+    return readBody(req, async (body) => {
+      try {
+        const { filename } = JSON.parse(body || '{}');
+        if (!filename || filename.includes('..') || filename.includes('/')) return send(res, 400, { error: 'filename required (bare mp4 name)' });
+        const outDir = path.join(__dirname, '..', 'out');
+        const inputMp4 = path.join(outDir, filename);
+        if (!fs.existsSync(inputMp4)) return send(res, 404, { error: 'input mp4 not found' });
+        const outName = filename.replace(/\.mp4$/i, '-captioned.mp4');
+        const outputMp4 = path.join(outDir, outName);
+        const result = await subtitles.burnSubtitles({ inputMp4, outputMp4 });
+        send(res, 200, { ok: true, filename: outName, wordCount: result.wordCount });
+      } catch (err) {
+        send(res, 500, { error: err.message });
       }
     });
   }
