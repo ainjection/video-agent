@@ -1,0 +1,50 @@
+[
+  {
+    "id": "ai-injection",
+    "name": "AI Injection",
+    "colors": {
+      "primary": "#00FF41",
+      "secondary": "#FF4500",
+      "accent": "#FFD700",
+      "background": "#050507",
+      "text": "#ffffff"
+    },
+    "fonts": {
+      "heading": "Arial Black, sans-serif",
+      "body": "Arial, sans-serif",
+      "mono": "Courier New, monospace"
+    }
+  },
+  {
+    "id": "two-flags",
+    "name": "Two Flags",
+    "colors": {
+      "primary": "#E53935",
+      "secondary": "#1976D2",
+      "accent": "#FFFFFF",
+      "background": "#0a0a0a",
+      "text": "#ffffff"
+    },
+    "fonts": {
+      "heading": "Arial Black, sans-serif",
+      "body": "Arial, sans-serif",
+      "mono": "Courier New, monospace"
+    }
+  },
+  {
+    "id": "hidden-mind",
+    "name": "Hidden Mind",
+    "colors": {
+      "primary": "#8B5CF6",
+      "secondary": "#22C55E",
+      "accent": "#F59E0B",
+      "background": "#0f0f1e",
+      "text": "#e5e7eb"
+    },
+    "fonts": {
+      "heading": "Georgia, serif",
+      "body": "system-ui, sans-serif",
+      "mono": "Menlo, monospace"
+    }
+  }
+]

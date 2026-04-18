@@ -1,0 +1,206 @@
+{
+  "Map": {
+    "originName": {
+      "type": "text",
+      "label": "Origin City",
+      "default": "New York",
+      "group": "Route"
+    },
+    "destinationName": {
+      "type": "text",
+      "label": "Destination City",
+      "default": "Tokyo",
+      "group": "Route"
+    },
+    "originLat": {
+      "type": "number",
+      "label": "Origin Latitude",
+      "default": 40.7128,
+      "group": "Route",
+      "min": -90,
+      "max": 90,
+      "step": 0.1
+    },
+    "originLon": {
+      "type": "number",
+      "label": "Origin Longitude",
+      "default": -74.006,
+      "group": "Route",
+      "min": -180,
+      "max": 180,
+      "step": 0.1
+    },
+    "destLat": {
+      "type": "number",
+      "label": "Destination Latitude",
+      "default": 35.6895,
+      "group": "Route",
+      "min": -90,
+      "max": 90,
+      "step": 0.1
+    },
+    "destLon": {
+      "type": "number",
+      "label": "Destination Longitude",
+      "default": 139.6917,
+      "group": "Route",
+      "min": -180,
+      "max": 180,
+      "step": 0.1
+    },
+    "accentColor": {
+      "type": "color",
+      "label": "Accent Color",
+      "default": "#f59e0b",
+      "group": "Colors"
+    },
+    "backgroundColor": {
+      "type": "color",
+      "label": "Background",
+      "default": "#0a0e1a",
+      "group": "Colors"
+    },
+    "baseColor": {
+      "type": "color",
+      "label": "Map Dots",
+      "default": "#1a2030",
+      "group": "Colors"
+    },
+    "textColor": {
+      "type": "color",
+      "label": "Text Color",
+      "default": "#fafafa",
+      "group": "Colors"
+    }
+  },
+  "Preview-90d4a7fc": {
+    "color1": {
+      "type": "color",
+      "label": "Color 1",
+      "default": "#7c3aed",
+      "group": "Palette"
+    },
+    "color2": {
+      "type": "color",
+      "label": "Color 2",
+      "default": "#ec4899",
+      "group": "Palette"
+    },
+    "color3": {
+      "type": "color",
+      "label": "Color 3",
+      "default": "#06b6d4",
+      "group": "Palette"
+    },
+    "color4": {
+      "type": "color",
+      "label": "Color 4",
+      "default": "#f59e0b",
+      "group": "Palette"
+    },
+    "baseColor": {
+      "type": "color",
+      "label": "Base / Background",
+      "default": "#0a0118",
+      "group": "Palette"
+    },
+    "intensity": {
+      "type": "number",
+      "label": "Color Intensity",
+      "default": 0.7,
+      "group": "Look",
+      "min": 0.1,
+      "max": 1,
+      "step": 0.05
+    },
+    "blur": {
+      "type": "number",
+      "label": "Blur Amount",
+      "default": 90,
+      "group": "Look",
+      "min": 20,
+      "max": 200,
+      "step": 5
+    },
+    "speed": {
+      "type": "number",
+      "label": "Motion Speed",
+      "default": 1,
+      "group": "Animation",
+      "min": 0.2,
+      "max": 3,
+      "step": 0.1
+    },
+    "showGrain": {
+      "type": "toggle",
+      "label": "Film Grain",
+      "default": true,
+      "group": "Look"
+    }
+  },
+  "Cloudyeffect": {
+    "color1": {
+      "type": "color",
+      "label": "Color 1",
+      "default": "#7c3aed",
+      "group": "Palette"
+    },
+    "color2": {
+      "type": "color",
+      "label": "Color 2",
+      "default": "#ec4899",
+      "group": "Palette"
+    },
+    "color3": {
+      "type": "color",
+      "label": "Color 3",
+      "default": "#06b6d4",
+      "group": "Palette"
+    },
+    "color4": {
+      "type": "color",
+      "label": "Color 4",
+      "default": "#f59e0b",
+      "group": "Palette"
+    },
+    "baseColor": {
+      "type": "color",
+      "label": "Base / Background",
+      "default": "#0a0118",
+      "group": "Palette"
+    },
+    "intensity": {
+      "type": "number",
+      "label": "Color Intensity",
+      "default": 0.7,
+      "group": "Look",
+      "min": 0.1,
+      "max": 1,
+      "step": 0.05
+    },
+    "blur": {
+      "type": "number",
+      "label": "Blur Amount",
+      "default": 90,
+      "group": "Look",
+      "min": 20,
+      "max": 200,
+      "step": 5
+    },
+    "speed": {
+      "type": "number",
+      "label": "Motion Speed",
+      "default": 1,
+      "group": "Animation",
+      "min": 0.2,
+      "max": 3,
+      "step": 0.1
+    },
+    "showGrain": {
+      "type": "toggle",
+      "label": "Film Grain",
+      "default": true,
+      "group": "Look"
+    }
+  }
+}

@@ -2,6 +2,22 @@ node_modules
 dist
 .DS_Store
 .env
+.env.local
 
-# Ignore the output video from Git but not videos you import into src/.
+# Rendered outputs
 out
+remotion-bundle
+.remotion
+
+# User-uploaded assets (potentially sensitive / large)
+dashboard/data/audio
+dashboard/data/images
+public/audio-agent
+public/images
+
+# Large generated caches
+dashboard/data/thumbnails
+
+# Editor / OS
+.vscode
+*.log

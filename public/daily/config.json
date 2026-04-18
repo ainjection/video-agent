@@ -1,0 +1,131 @@
+{
+  "date": "2026-04-10",
+  "totalFrames": 6241,
+  "totalDuration": "208.0",
+  "numPrompts": 10,
+  "sections": [
+    {
+      "type": "intro",
+      "start": 0,
+      "frames": 315
+    },
+    {
+      "type": "prompt",
+      "index": 0,
+      "start": 315,
+      "frames": 407,
+      "voDuration": 10.541859,
+      "prompt": "An astronaut in a magenta, black, and white space suit floating in outer space, with Earth visible in the background, capturing the contrast of the vibrant colors against the dark universe.",
+      "image": "daily/img_1.jpg",
+      "voiceover": "daily/vo_1.mp3",
+      "category": "Fantasy"
+    },
+    {
+      "type": "prompt",
+      "index": 1,
+      "start": 722,
+      "frames": 234,
+      "voDuration": 4.783311,
+      "prompt": "art line, techno, dark, gothic, darkness, surrealism",
+      "image": "daily/img_2.png",
+      "voiceover": "daily/vo_2.mp3",
+      "category": "AI Influencer"
+    },
+    {
+      "type": "prompt",
+      "index": 2,
+      "start": 956,
+      "frames": 272,
+      "voDuration": 6.037188,
+      "prompt": "stills archive, warner bros .com --c 15 --style raw --v 6",
+      "image": "daily/img_3.png",
+      "voiceover": "daily/vo_3.mp3",
+      "category": "Cinematic"
+    },
+    {
+      "type": "prompt",
+      "index": 3,
+      "start": 1228,
+      "frames": 1257,
+      "voDuration": 38.870204,
+      "prompt": "A dramatic cinematic scene featuring two rival products placed side by side in a custom-designed environment that visually reflects their identities. The composition should include high contrast lighting, atmospheric effects like mist, fog, or neon glow, and hyper-detailed textures. Incorporate a powerful 3D slogan \"LET'S AI\" below or behind the products in bold stylized typography that fits the scene’s mood. The products must reflect the essence of XBOX and Playstation through color, lighting, and placement. Ultra-realistic, moody tones, with sharp depth of field and high resolution",
+      "image": "daily/img_4.png",
+      "voiceover": "daily/vo_4.mp3",
+      "category": "Products"
+    },
+    {
+      "type": "prompt",
+      "index": 4,
+      "start": 2485,
+      "frames": 251,
+      "voDuration": 5.34059,
+      "prompt": "video game still, cdprojektred .com, cyberpunk 2077",
+      "image": "daily/img_5.png",
+      "voiceover": "daily/vo_5.mp3",
+      "category": "Cinematic"
+    },
+    {
+      "type": "prompt",
+      "index": 5,
+      "start": 2736,
+      "frames": 670,
+      "voDuration": 19.319002,
+      "prompt": "C0001.R3D: The most realistic photograph ever in the world, Authentic shot of a top model, professional photoshoot for Vogue Magazine, beautiful 24 year old woman with dark hair with highlights, blue eyes, behind the scenes of a major hollywood film, sitting in a director's chair",
+      "image": "daily/img_6.png",
+      "voiceover": "daily/vo_6.mp3",
+      "category": "Cinematic"
+    },
+    {
+      "type": "prompt",
+      "index": 6,
+      "start": 3406,
+      "frames": 894,
+      "voDuration": 26.795828,
+      "prompt": "A documentary-style photograph showcasing a young, attractive woman with brunette hair and blue eyes in a dystopian world. She is dressed in futuristic clothing, amidst a backdrop of futuristic, ruined buildings. The setting is during the 'blue hour,' adding a moody and evocative atmosphere. The woman is gazing into the distance, embodying a sense of contemplation or anticipation --ar 16:9 --style qUCGoMjEi",
+      "image": "daily/img_7.png",
+      "voiceover": "daily/vo_7.mp3",
+      "category": "Cinematic"
+    },
+    {
+      "type": "prompt",
+      "index": 7,
+      "start": 4300,
+      "frames": 566,
+      "voDuration": 15.836009,
+      "prompt": "The tennis player tries to control the burning tennis ball, but to no avail, The court is in a desert resembling Mars, The weather is amazingly stormy, d, superb cinematic color grading, key visual, HDR, film still, --ar 16:9",
+      "image": "daily/img_8.png",
+      "voiceover": "daily/vo_8.mp3",
+      "category": "Cinematic"
+    },
+    {
+      "type": "prompt",
+      "index": 8,
+      "start": 4866,
+      "frames": 521,
+      "voDuration": 14.349932,
+      "prompt": "live-action sports shot, fast-paced, POV style, a soccer player in the world cup, swiftly dribbling the baller and moving downfield to score a goal against the opposing team, in a big stadium with thousands of people in the stands cheering",
+      "image": "daily/img_9.png",
+      "voiceover": "daily/vo_9.mp3",
+      "category": "Cinematic"
+    },
+    {
+      "type": "prompt",
+      "index": 9,
+      "start": 5387,
+      "frames": 468,
+      "voDuration": 12.585215,
+      "prompt": "cinematic, ultra realistic, wide shot, Canon EOS R5 at f/2, HBO series, Game of Thrones, Emilia Clarke as her character Daenerys Targaryen",
+      "image": "daily/img_10.png",
+      "voiceover": "daily/vo_10.mp3",
+      "category": "Cinematic"
+    },
+    {
+      "type": "outro",
+      "start": 5855,
+      "frames": 386
+    }
+  ],
+  "introVo": "daily/vo_intro.mp3",
+  "outroVo": "daily/vo_outro.mp3",
+  "ambientMusic": "prompts/ambient.mp3"
+}

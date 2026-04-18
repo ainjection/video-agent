@@ -1,0 +1,9 @@
+{
+  "text": "no news today ",
+  "style": "glitch",
+  "backgroundColor": "#0a0a1a",
+  "color": "#ffffff",
+  "fontSize": 80,
+  "fontFamily": "system-ui, sans-serif",
+  "position": "center"
+}

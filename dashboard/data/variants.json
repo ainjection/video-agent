@@ -1,0 +1,30 @@
+{
+  "Ownthescreen": [
+    {
+      "name": "own it 2 ",
+      "props": {},
+      "updatedAt": 1776526100321,
+      "id": "mo4hrrz5",
+      "createdAt": 1776526100321
+    }
+  ],
+  "Cloudyeffect": [
+    {
+      "name": "new",
+      "props": {
+        "color1": "#7c3aed",
+        "color2": "#ec4899",
+        "color3": "#06b6d4",
+        "color4": "#f59e0b",
+        "baseColor": "#0a0118",
+        "intensity": 0.7,
+        "blur": 90,
+        "showGrain": true,
+        "speed": 1
+      },
+      "updatedAt": 1776533628526,
+      "id": "mo4m94ry",
+      "createdAt": 1776533628526
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "color1": "#00FF41",
+  "color2": "#00FF41",
+  "color3": "#00FF41",
+  "color4": "#00FF41",
+  "baseColor": "#00FF41",
+  "intensity": 0.7,
+  "blur": 90,
+  "showGrain": true,
+  "speed": 1
+}

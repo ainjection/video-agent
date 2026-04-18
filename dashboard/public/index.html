@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Video Agent Dashboard</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">🎬</div>
+        <div>
+          <div class="brand-name">Video Agent</div>
+          <div class="brand-sub">Workstation</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-item active" data-view="library">
+          <span class="nav-icon">📚</span> Library
+        </button>
+        <button class="nav-item" data-view="brandkits">
+          <span class="nav-icon">🎨</span> Brand Kits
+        </button>
+        <button class="nav-item" data-view="timeline">
+          <span class="nav-icon">🎞️</span> Timeline
+        </button>
+        <button class="nav-item" data-view="ai">
+          <span class="nav-icon">🪄</span> AI Compose
+        </button>
+        <button class="nav-item" data-view="aigen">
+          <span class="nav-icon">🎨</span> AI Generate
+        </button>
+        <button class="nav-item" data-view="aistudio">
+          <span class="nav-icon">🤖</span> AI Studio
+        </button>
+        <button class="nav-item" data-view="create">
+          <span class="nav-icon">✨</span> Import Code
+        </button>
+        <button class="nav-item" data-view="daily">
+          <span class="nav-icon">🤖</span> Daily Render
+        </button>
+        <button class="nav-item" data-view="history">
+          <span class="nav-icon">🎞️</span> Render History
+        </button>
+        <button class="nav-item" data-view="maintenance">
+          <span class="nav-icon">🧹</span> Cleanup
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="version">v0.1 · Local</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <!-- LIBRARY -->
+      <section class="view" data-view="library">
+        <header class="view-header">
+          <div>
+            <h1>Library</h1>
+            <div class="muted" id="thumbStatus"></div>
+          </div>
+          <input id="librarySearch" type="text" placeholder="Search compositions…" class="search-input">
+        </header>
+        <div class="category-tabs" id="categoryTabs"></div>
+        <div class="library-grid" id="libraryGrid"></div>
+      </section>
+
+      <!-- LIBRARY DETAIL (drawer / modal view) -->
+      <section class="view hidden" data-view="detail">
+        <header class="view-header">
+          <button class="btn" id="backToLibrary">← Back to Library</button>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="preview-mode-toggle">
+              <button class="mode-btn active" data-mode="video">Rendered Video</button>
+              <button class="mode-btn" data-mode="studio">Live Studio</button>
+            </div>
+            <button class="btn" id="regenerateThumb">↻ Regenerate preview</button>
+          </div>
+        </header>
+        <div class="detail-layout">
+          <div class="detail-preview" id="detailPreview"></div>
+          <div class="detail-form" id="detailForm"></div>
+        </div>
+      </section>
+
+      <!-- BRAND KITS -->
+      <section class="view hidden" data-view="brandkits">
+        <header class="view-header">
+          <h1>Brand Kits</h1>
+          <button id="newBrandKit" class="btn primary">+ New Brand Kit</button>
+        </header>
+        <div class="brandkits-grid" id="brandkitsGrid"></div>
+      </section>
+
+      <!-- TIMELINE / EDITOR -->
+      <section class="view hidden" data-view="timeline">
+        <header class="view-header">
+          <div>
+            <h1>Timeline Editor</h1>
+            <div class="muted">Drag compositions from the left onto the timeline to build a video.</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <select id="tlProjectPicker" class="btn" style="padding:8px 12px"><option value="">Load project…</option></select>
+            <button class="btn" id="tlSave">💾 Save</button>
+            <input id="tlMusicFile" type="file" accept="audio/*" style="display:none">
+            <button class="btn" id="tlMusicBtn">🎵 Music</button>
+            <label style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)">
+              Crossfade
+              <input id="tlCrossfade" type="number" min="0" max="60" value="0" style="width:56px;background:var(--panel);border:1px solid var(--border);color:var(--text);padding:4px 6px;border-radius:4px;font-size:11px">
+              <span style="color:var(--muted)">f</span>
+            </label>
+            <span class="tl-total" id="tlTotal">0 clips · 0.0s</span>
+            <button class="btn" id="tlClear">Clear</button>
+            <button class="btn primary" id="tlRender">▶ Render Project</button>
+          </div>
+        </header>
+        <div id="tlMusicStatus" style="display:none;padding:6px 12px;background:var(--panel);border:1px solid var(--accent);border-radius:6px;font-size:11px;color:var(--accent);margin-bottom:10px"></div>
+
+        <div class="timeline-layout">
+          <div class="tl-library" id="tlLibrary"></div>
+          <div class="tl-editor">
+            <div class="tl-preview" id="tlPreview">
+              <div class="preview-placeholder">Drop clips below → hit <b>Render Project</b> → preview appears here.</div>
+            </div>
+            <div class="tl-strip" id="tlStrip">
+              <div class="tl-drop-hint" id="tlDropHint">Drag a composition here to add it to the timeline</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AI COMPOSE -->
+      <section class="view hidden" data-view="ai">
+        <header class="view-header">
+          <h1>AI Compose</h1>
+          <div class="muted">Describe the video you want — Claude picks compositions from your library and builds a timeline.</div>
+        </header>
+        <div class="ai-form">
+          <label class="full"><span>Describe the video</span>
+            <textarea id="aiDescription" rows="4" placeholder="30 second intro about AI tools for content creators. Start with a big logo reveal, then three quick feature highlights, end with a subscribe CTA. Add 15-frame crossfades."></textarea>
+          </label>
+          <div class="ai-examples">
+            <span>Try:</span>
+            <button class="ai-example" data-ex="20 second product demo with title card, two feature callouts, and outro">📦 Product demo</button>
+            <button class="ai-example" data-ex="15 second YouTube intro: logo reveal, channel name, subscribe prompt">▶ YouTube intro</button>
+            <button class="ai-example" data-ex="30 second KDP research promo: showing niche scores, cover analyser, and call-to-action">📚 KDP promo</button>
+          </div>
+          <div class="actions" style="align-items:center">
+            <label style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);margin-right:8px">
+              Provider
+              <select id="aiProvider" class="btn" style="padding:6px 10px;font-size:11px">
+                <option value="auto">Auto</option>
+                <option value="claude">Claude (Sonnet 4.5)</option>
+                <option value="gemini">Gemini 3.1 Pro</option>
+              </select>
+            </label>
+            <button id="aiComposeBtn" class="btn primary">🪄 Compose</button>
+          </div>
+          <div id="aiStatus" class="ai-status"></div>
+          <div id="aiResult" class="ai-result"></div>
+        </div>
+      </section>
+
+      <!-- AI GENERATE -->
+      <section class="view hidden" data-view="aigen">
+        <header class="view-header">
+          <h1>AI Generate</h1>
+          <div class="muted">Describe the video + drop your images. AI assembles blocks → renders → you keep or discard.</div>
+        </header>
+        <div class="aigen-form">
+          <label class="full"><span>Describe the video</span>
+            <textarea id="aigenDescription" rows="4" placeholder="Intro with this image inside an iPad with bold spinning text 'Launch Day' over a purple gradient."></textarea>
+          </label>
+
+          <label class="full"><span>Reference images (drag-drop or click)</span>
+            <div id="aigenDrop" class="aigen-drop">
+              <div class="aigen-drop-hint">Drag up to 4 images here or click to select</div>
+              <input id="aigenFiles" type="file" accept="image/*" multiple style="display:none">
+            </div>
+          </label>
+          <div id="aigenImagesGrid" class="aigen-images-grid"></div>
+
+          <div class="aigen-row">
+            <label><span>Provider</span>
+              <select id="aigenProvider" class="btn" style="padding:8px 10px">
+                <option value="auto">Auto</option>
+                <option value="claude">Claude (Sonnet 4.5)</option>
+                <option value="gemini">Gemini 3.1 Pro</option>
+              </select>
+            </label>
+            <button id="aigenBtn" class="btn primary">🎨 Generate</button>
+          </div>
+          <div id="aigenStatus" class="ai-status"></div>
+          <div id="aigenResult" class="ai-result"></div>
+        </div>
+      </section>
+
+      <!-- MAINTENANCE / CLEANUP -->
+      <section class="view hidden" data-view="maintenance">
+        <header class="view-header">
+          <h1>Cleanup</h1>
+          <div class="muted">Remove auto-generated preview / timeline / AI-gen compositions that have built up in the library.</div>
+        </header>
+        <div style="max-width:720px;display:grid;gap:14px">
+          <div id="cleanupStatus" style="padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:12px;color:var(--muted)">Loading…</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button id="cleanupRefresh" class="btn">↻ Refresh</button>
+            <button id="cleanupBroken" class="btn">🧹 Clean broken only</button>
+            <button id="cleanupAll" class="btn danger">🔥 Nuke all auto-gen</button>
+          </div>
+          <div class="muted" style="font-size:11px">
+            <b>Broken</b> = auto-gen comps whose thumbnail generation failed (likely malformed files).<br>
+            <b>All auto-gen</b> = Preview-*, TimelineProject-*, AIGen-*. These are temporary by design — cleaning them is always safe. Your named / saved compositions are never touched.
+          </div>
+        </div>
+      </section>
+
+      <!-- AI STUDIO -->
+      <section class="view hidden" data-view="aistudio">
+        <header class="view-header">
+          <div>
+            <h1>AI Studio</h1>
+            <div class="muted">Chat with Remotion-aware AI. Describe your video, answer follow-ups, get working code. Uses Remotion's own system prompt + Tailwind + best practices.</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="aistudioProvider" class="btn" style="padding:8px 10px">
+              <option value="auto">Auto</option>
+              <option value="claude">Claude Sonnet 4.5</option>
+              <option value="gemini">Gemini 3.1 Pro</option>
+            </select>
+            <button id="aistudioNew" class="btn">↻ New chat</button>
+          </div>
+        </header>
+
+        <div class="aistudio-layout">
+          <div class="aistudio-chat" id="aistudioChat">
+            <div class="aistudio-welcome">
+              <h3>Describe the video you want.</h3>
+              <p>The AI will ask follow-ups before writing code. When it outputs a complete TSX file, a <b>Preview</b> button appears that renders it immediately.</p>
+              <p style="color:var(--muted);font-size:12px;margin-top:14px">Examples to try:</p>
+              <div class="aistudio-examples">
+                <button class="aistudio-example">Make a 5s intro with my brand name 'AI Injection' in neon green over dark particles, bold Tailwind typography.</button>
+                <button class="aistudio-example">Zoom into a map of Los Angeles, pan to New York with a curved line, stop on Paris with Eiffel Tower in 3D. About 15s.</button>
+                <button class="aistudio-example">Create a demo video of a fictional app called 'Presscut'. Use React components to replicate UI: dashboard, one-click button, results panel. Ask me for details.</button>
+                <button class="aistudio-example">15s product showcase with three benefit cards fading in, ending on a pulsing 'Get Early Access' CTA.</button>
+              </div>
+            </div>
+          </div>
+          <form class="aistudio-inputbar" id="aistudioInputBar">
+            <textarea id="aistudioInput" rows="2" placeholder="Describe what you want to make, or answer the AI's question…"></textarea>
+            <button class="btn primary" type="submit" id="aistudioSend">Send ↵</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- CREATE / IMPORT -->
+      <section class="view hidden" data-view="create">
+        <header class="view-header">
+          <h1>Import Remotion Code</h1>
+          <div class="muted">Paste → Render Preview → Keep in library or discard.</div>
+        </header>
+        <div class="import-form">
+          <div class="import-fields">
+            <label><span>Duration (frames)</span><input id="importDuration" type="number" value="150"></label>
+            <label><span>FPS</span><input id="importFps" type="number" value="30"></label>
+            <label><span>Width</span><input id="importWidth" type="number" value="1920"></label>
+            <label><span>Height</span><input id="importHeight" type="number" value="1080"></label>
+          </div>
+          <label class="full"><span>Paste TSX code — accepts <code>export const X = ...</code>, <code>export default preset</code>, or raw JSX</span>
+            <textarea id="importCode" rows="16" placeholder="import { AbsoluteFill, useCurrentFrame, interpolate } from 'remotion';&#10;&#10;export const MyCoolIntro = () => {&#10;  const frame = useCurrentFrame();&#10;  const opacity = interpolate(frame, [0, 30], [0, 1]);&#10;  return (&#10;    &lt;AbsoluteFill style={{ background: '#000', alignItems: 'center', justifyContent: 'center' }}&gt;&#10;      &lt;div style={{ color: 'white', fontSize: 120, opacity }}&gt;Hello&lt;/div&gt;&#10;    &lt;/AbsoluteFill&gt;&#10;  );&#10;};"></textarea>
+          </label>
+          <div class="actions">
+            <button id="importRenderPreview" class="btn primary">▶ Render Preview</button>
+          </div>
+
+          <div id="importPreviewStage" class="import-preview-stage" style="display:none">
+            <div class="progress-panel active" id="importProgress">
+              <div class="progress-header">
+                <span id="importProgressLabel">Rendering preview…</span>
+                <span id="importProgressPct">0%</span>
+              </div>
+              <div class="progress-bar"><div id="importProgressFill" style="width:0%"></div></div>
+              <div class="progress-line" id="importProgressLine">starting…</div>
+            </div>
+
+            <div id="importResult" style="margin-top:14px"></div>
+          </div>
+
+          <div id="importStatus" class="import-status"></div>
+        </div>
+      </section>
+
+      <!-- DAILY RENDER -->
+      <section class="view hidden" data-view="daily">
+        <header class="view-header">
+          <h1>Daily Render</h1>
+          <div class="muted">Pull prompts from Airtable and batch-render a template.</div>
+        </header>
+        <div class="daily-form">
+          <label>
+            <span>Template</span>
+            <select id="dailyTemplate"></select>
+          </label>
+          <label>
+            <span>Prompt source</span>
+            <select id="dailySource">
+              <option value="airtable">Airtable — Nano Banana prompts</option>
+              <option value="paste">Paste prompts manually</option>
+            </select>
+          </label>
+          <label>
+            <span>Count</span>
+            <input id="dailyCount" type="number" value="10" min="1" max="50">
+          </label>
+          <label class="full">
+            <span>Pasted prompts (one per line, used if "Paste" chosen)</span>
+            <textarea id="dailyPasted" rows="6" placeholder="cinematic dog eating ice cream&#10;retro 80s office tour&#10;..."></textarea>
+          </label>
+          <div class="actions">
+            <button id="dailyRun" class="btn primary">Queue batch</button>
+          </div>
+          <div id="dailyStatus" class="daily-status"></div>
+        </div>
+      </section>
+
+      <!-- HISTORY -->
+      <section class="view hidden" data-view="history">
+        <header class="view-header">
+          <h1>Render History</h1>
+          <button id="refreshHistory" class="btn">↻ Refresh</button>
+        </header>
+        <div class="history-list" id="historyList"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
