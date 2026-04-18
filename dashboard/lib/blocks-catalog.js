@@ -228,5 +228,85 @@ module.exports = {
       easing: { type: 'smooth|bounce|linear|inOut|sharp|elastic', default: 'smooth' },
       align: { type: 'left|center|right', default: 'center' }
     }
+  },
+  Glitch: {
+    category: 'effect',
+    description: 'Text with RGB chromatic aberration and jitter — glitchy/cyber feel.',
+    props: {
+      text: { type: 'string', required: true },
+      fontSize: { type: 'number', default: 200 },
+      color: { type: 'hex', default: '#ffffff' },
+      accentColor1: { type: 'hex', default: '#ff0080' },
+      accentColor2: { type: 'hex', default: '#00ffe0' },
+      intensity: { type: 'number', default: 1, description: '0 = static, 2 = chaos' },
+      align: { type: 'left|center|right', default: 'center' }
+    }
+  },
+  ScrollMarquee: {
+    category: 'overlay',
+    description: 'Infinite horizontal scrolling ticker — news/breaking-style banner.',
+    props: {
+      items: { type: 'array<string>', default: ['NEW', 'DROP'] },
+      fontSize: { type: 'number', default: 90 },
+      color: { type: 'hex', default: '#ffffff' },
+      separatorColor: { type: 'hex', default: '#00e676' },
+      background: { type: 'hex', default: '#0a0a0a' },
+      pixelsPerFrame: { type: 'number', default: 6 },
+      separator: { type: 'string', default: '★' },
+      position: { type: 'top|middle|bottom', default: 'middle' },
+      height: { type: 'number', default: 160 }
+    }
+  },
+  BrandStripe: {
+    category: 'overlay',
+    description: 'Multi-colour brand stripe that sweeps in along an edge. Good as accent/reveal.',
+    props: {
+      colors: { type: 'array<hex>', default: ['#00e676', '#ffffff', '#ff0080'] },
+      direction: { type: 'horizontal|vertical', default: 'horizontal' },
+      position: { type: 'top|bottom|left|right|center', default: 'bottom' },
+      thickness: { type: 'number', default: 24 },
+      sweepInFromFrame: { type: 'number', default: 0 },
+      durationInFrames: { type: 'number', default: 20 },
+      easing: { type: 'smooth|bounce|linear|inOut|sharp|elastic', default: 'smooth' }
+    }
+  },
+  VideoFrame: {
+    category: 'frame',
+    description: 'Mac/phone/clean-chrome video frame for embedding MP4 screen recordings.',
+    props: {
+      src: { type: 'string (static path or url)', required: true },
+      chrome: { type: 'mac|clean|phone', default: 'mac' },
+      width: { type: 'number', default: 1400 },
+      rotate: { type: 'number', default: 0 },
+      shadow: { type: 'boolean', default: true },
+      label: { type: 'string', default: '' }
+    }
+  },
+  SplitHeadline: {
+    category: 'text',
+    description: 'Two-line headline with separate colours/weights. Top wipes in left→right, bottom right→left.',
+    props: {
+      topText: { type: 'string', default: 'THIS IS' },
+      bottomText: { type: 'string', default: 'BIG' },
+      topColor: { type: 'hex', default: '#ffffff' },
+      bottomColor: { type: 'hex', default: '#00e676' },
+      fontSize: { type: 'number', default: 240 },
+      topWeight: { type: 'number', default: 700 },
+      bottomWeight: { type: 'number', default: 900 },
+      durationInFrames: { type: 'number', default: 25 }
+    }
+  },
+  LogoGrid: {
+    category: 'content',
+    description: 'Grid of logos that pop in staggered. Good for "featured in / trusted by".',
+    props: {
+      logos: { type: 'array<string (static path or url)>', required: true },
+      columns: { type: 'number', default: 4 },
+      background: { type: 'hex', default: '#0a0a0a' },
+      tileColor: { type: 'hex', default: '#151515' },
+      cellHeight: { type: 'number', default: 180 },
+      staggerFrames: { type: 'number', default: 4 },
+      maxLogoHeight: { type: 'number', default: 80 }
+    }
   }
 };

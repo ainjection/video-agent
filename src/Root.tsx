@@ -46,6 +46,7 @@ import { PaperclipIntro } from "./PaperclipIntro";
 import { PaperclipTest } from "./PaperclipTest";
 import { PaperclipTest2 } from "./PaperclipTest2";
 import { Opus47PaperclipIntro } from "./Opus47PaperclipIntro";
+import { BlockCompositions } from "./blocks/register";
 
 
 
@@ -157,21 +158,11 @@ import { __ImportedComp as __IC_Newsub5 } from "./imports/Newsub5";
 
 import { __ImportedComp as __IC_Revenue } from "./imports/Revenue";
 
+
 export const RemotionRoot: React.FC = () => {
   return (
     <>
-
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      {/* Imported: Revenue */}
+{/* Imported: Revenue */}
       <Composition
         id="Revenue"
         component={__IC_Revenue}
@@ -1087,6 +1078,7 @@ export const RemotionRoot: React.FC = () => {
         width={1920}
         height={1080}
       />
+      <BlockCompositions />
     </>
   );
 };
