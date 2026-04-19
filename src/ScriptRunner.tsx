@@ -13,6 +13,13 @@ import {
   GradientBG,
   ParticleField,
   SolidColor,
+  KineticTypography,
+  GlassmorphismCard,
+  ChromaticScanline,
+  MatrixRain,
+  DepthZoom,
+  ShatterReveal,
+  TerminalWindow,
 } from './blocks';
 
 const BLOCK_MAP: Record<string, React.ComponentType<any>> = {
@@ -25,6 +32,13 @@ const BLOCK_MAP: Record<string, React.ComponentType<any>> = {
   TypewriterText,
   TypingCode,
   CountUp,
+  KineticTypography,
+  GlassmorphismCard,
+  ChromaticScanline,
+  MatrixRain,
+  DepthZoom,
+  ShatterReveal,
+  TerminalWindow,
 };
 
 const BG_MAP: Record<string, React.ComponentType<any>> = {
@@ -37,10 +51,8 @@ export type ScriptScene = {
   text: string;
   audio: string;
   durationInFrames: number;
-  // NEW: per-scene block + props so each sentence can use a different look.
   block?: string;
   blockProps?: Record<string, unknown>;
-  // Optional per-scene background override.
   bg?: string;
   bgProps?: Record<string, unknown>;
 };
@@ -61,9 +73,12 @@ export const ScriptRunner: React.FC<ScriptRunnerProps> = ({
   defaultBlock = 'BigHeadline',
 }) => {
   let frameCursor = 0;
+  // If any scene specifies its own bg, we skip the default top-level gradient
+  // so the scene bg has a clean canvas to draw on.
+  const anyMoodBg = scenes.some(s => s.bg);
   return (
     <AbsoluteFill style={{ background: '#000' }}>
-      <GradientBG colors={bgColors} angle={135} animated={true} />
+      {!anyMoodBg && <GradientBG colors={bgColors} angle={135} animated={true} />}
       {scenes.map((s, i) => {
         const from = frameCursor;
         frameCursor += s.durationInFrames;
