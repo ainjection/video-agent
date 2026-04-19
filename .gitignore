@@ -25,7 +25,8 @@ dashboard/data/timeline-projects.json
 dashboard/data/subtitles/
 
 # Blender render intermediates (PNG sequences before ffmpeg stitch)
-public/hero-library/_*_frames/
+public/hero-library/_*frames/
+public/hero-library/_*-frames/
 public/script-vo/
 
 # Temporary generation outputs
