@@ -17,6 +17,10 @@ let writeChain = Promise.resolve();
 
 function updateDefaultProps(compId, newProps) {
   writeChain = writeChain.then(async () => {
+    // Hero clips live in public/hero-library/manifest.json, not Root.tsx.
+    if (compId.startsWith('hero-') || compId.startsWith('H-')) {
+      return; // Prop changes via the dashboard form get applied at render time via --props; no file write needed.
+    }
     // Block-* compositions live in register.tsx (BLOCKS array), not Root.tsx.
     if (compId.startsWith('Block-')) {
       const code = fs.readFileSync(REGISTER_FILE, 'utf8');

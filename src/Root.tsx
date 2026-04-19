@@ -161,6 +161,12 @@ import { __ImportedComp as __IC_Revenue } from "./imports/Revenue";
 
 
 
+
+
+
+
+
+
 export const RemotionRoot: React.FC = () => {
   return (
     <>
@@ -266,6 +272,27 @@ export const RemotionRoot: React.FC = () => {
           "backgroundColor": "#09090b"
         }}
       />
+      <Composition
+        id="Bigbooty-Copy"
+        component={__IC_Boldtext}
+        durationInFrames={150}
+        fps={30}
+        width={1920}
+        height={1080}
+        defaultProps={{
+          "word1": "tits",
+          "word2": "arse",
+          "word3": "fanny",
+          "word4": "jubbly",
+          "word5": "",
+          "accentEvery": 3,
+          "pulseBackground": true,
+          "fontSize": 240,
+          "textColor": "#451111",
+          "accentColor": "#f59e0b",
+          "backgroundColor": "#09090b"
+        }}
+      />
 {/* Imported: Cloudyeffect */}
       <Composition
         id="Cloudyeffect"
@@ -300,7 +327,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="TimelinePreview"
         component={TimelinePreview}
-        durationInFrames={320}
+        durationInFrames={180}
         fps={30}
         width={1920}
         height={1080}
@@ -477,6 +504,24 @@ export const RemotionRoot: React.FC = () => {
           fontSize: 80,
           fontFamily: "system-ui, sans-serif",
           position: "center",
+        }}
+      />
+      <Composition
+        id="AnimatedText-Glitch-Copy"
+        component={AnimatedText}
+        schema={animatedTextSchema}
+        durationInFrames={90}
+        fps={30}
+        width={1920}
+        height={1080}
+        defaultProps={{
+          "text": "BREAKING ",
+          "style": "glitch",
+          "backgroundColor": "#924fe3",
+          "color": "#213a54",
+          "fontSize": 80,
+          "fontFamily": "system-ui, sans-serif",
+          "position": "center"
         }}
       />
       <Composition
@@ -1081,6 +1126,7 @@ export const RemotionRoot: React.FC = () => {
         height={1080}
       />
       <BlockCompositions />
+      <HeroCompositions />
       <Composition
         id="ScriptRunner"
         component={ScriptRunner}

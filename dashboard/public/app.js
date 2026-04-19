@@ -56,18 +56,32 @@ async function loadHeroLibrary() {
       </div>`;
       return;
     }
-    grid.innerHTML = clips.map(c => `
+    grid.innerHTML = clips.map(c => {
+      const cleaned = String(c.id || c.filename).replace(/[^A-Za-z0-9-]/g, '-');
+      const compId = (/^[A-Za-z]/.test(cleaned) ? cleaned : 'H-' + cleaned).slice(0, 60);
+      return `
       <div class="hero-card" style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px">
         <video src="/hero/${encodeURIComponent(c.filename)}" autoplay muted loop playsinline style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;background:#000"></video>
         <div style="font-size:14px;font-weight:700">${escapeHtml(c.name)}</div>
         <div style="font-size:11px;color:var(--muted);line-height:1.4;min-height:30px">${escapeHtml(c.description || '')}</div>
+        <div style="font-size:10px;color:var(--muted);font-family:monospace">comp id: <span style="color:var(--accent)">${escapeHtml(compId)}</span></div>
         <div style="display:flex;gap:4px;flex-wrap:wrap;font-size:10px">
           ${c.category ? `<span style="background:var(--panel-2);padding:2px 6px;border-radius:4px;color:var(--accent)">${escapeHtml(c.category)}</span>` : ''}
           ${c.source ? `<span style="background:var(--panel-2);padding:2px 6px;border-radius:4px;color:var(--muted)">${escapeHtml(c.source)}</span>` : ''}
           ${(c.tags || []).map(t => `<span style="background:var(--panel-2);padding:2px 6px;border-radius:4px;color:var(--muted)">#${escapeHtml(t)}</span>`).join('')}
         </div>
-      </div>
-    `).join('');
+        <div style="display:flex;gap:6px;margin-top:4px">
+          <button class="btn primary hero-open-btn" data-comp="${escapeAttr(compId)}" style="flex:1">Open in Library →</button>
+        </div>
+      </div>`;
+    }).join('');
+    grid.querySelectorAll('.hero-open-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const compId = btn.getAttribute('data-comp');
+        document.querySelector('.nav-item[data-view="library"]').click();
+        setTimeout(() => selectComposition(compId), 200);
+      });
+    });
   } catch (err) {
     grid.innerHTML = `<div style="color:var(--danger)">Load failed: ${escapeHtml(err.message)}</div>`;
   }

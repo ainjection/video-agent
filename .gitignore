@@ -22,6 +22,15 @@ dashboard/data/thumbnails
 dashboard/data/render-history.json
 dashboard/data/props/
 dashboard/data/timeline-projects.json
+dashboard/data/subtitles/
+
+# Blender render intermediates (PNG sequences before ffmpeg stitch)
+public/hero-library/_*_frames/
+public/script-vo/
+
+# Temporary generation outputs
+meshy-source-images/
+public/hero-library/_preview*.png
 
 # Editor / OS
 .vscode

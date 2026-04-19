@@ -32,7 +32,42 @@ function listCompositions() {
   // src/blocks/register.tsx as a BLOCKS array, not as literal <Composition>
   // tags, so the regex above won't see them.
   compositions.push(...listBlockCompositions());
+  // Hero clips — generated from the manifest in public/hero-library/.
+  compositions.push(...listHeroCompositions());
   return compositions;
+}
+
+function listHeroCompositions() {
+  const manifestFile = path.join(__dirname, '..', '..', 'public', 'hero-library', 'manifest.json');
+  if (!fs.existsSync(manifestFile)) return [];
+  try {
+    const manifest = JSON.parse(fs.readFileSync(manifestFile, 'utf8'));
+    const clips = Array.isArray(manifest.clips) ? manifest.clips : [];
+    return clips.map(c => {
+      const cleaned = String(c.id || c.filename).replace(/[^A-Za-z0-9-]/g, '-');
+      const compId = (/^[A-Za-z]/.test(cleaned) ? cleaned : 'H-' + cleaned).slice(0, 60);
+      const seconds = c.durationSeconds || 2.5;
+      return {
+        id: compId,
+        component: 'HeroClip',
+        importPath: './HeroClip',
+        durationInFrames: Math.max(15, Math.round(seconds * 30)),
+        fps: 30,
+        width: 1920,
+        height: 1080,
+        defaultProps: {
+          src: `hero-library/${c.filename}`,
+          overlayText: '',
+          overlayColor: '#ffffff',
+          overlayFontSize: 140,
+          overlayAlign: 'bottom',
+          darken: 0
+        }
+      };
+    });
+  } catch {
+    return [];
+  }
 }
 
 function listBlockCompositions() {

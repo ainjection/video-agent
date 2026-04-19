@@ -2,6 +2,7 @@
 // filter chips (and to suggest sensible icon/colour later).
 const RULES = [
   { match: /^Block-/, category: 'Block' },
+  { match: /^hero-|^H-/, category: 'Hero' },
   { match: /^Sub|Subscribe/i, category: 'Subscribe' },
   { match: /LowerThird/i, category: 'Lower Third' },
   { match: /Counter/i, category: 'Counter' },
