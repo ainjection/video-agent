@@ -30,5 +30,6 @@ export { ChromaticScanline } from './ChromaticScanline';
 export { MatrixRain } from './MatrixRain';
 export { DepthZoom } from './DepthZoom';
 export { ShatterReveal } from './ShatterReveal';
+export { CardStack3D } from './CardStack3D';
 export { easings, resolveEasing, framesToSeconds, secondsToFrames } from './utils';
 export type { EasingName } from './utils';

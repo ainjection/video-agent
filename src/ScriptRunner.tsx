@@ -20,6 +20,7 @@ import {
   DepthZoom,
   ShatterReveal,
   TerminalWindow,
+  CardStack3D,
 } from './blocks';
 
 const BLOCK_MAP: Record<string, React.ComponentType<any>> = {
@@ -39,6 +40,7 @@ const BLOCK_MAP: Record<string, React.ComponentType<any>> = {
   DepthZoom,
   ShatterReveal,
   TerminalWindow,
+  CardStack3D,
 };
 
 const BG_MAP: Record<string, React.ComponentType<any>> = {

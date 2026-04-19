@@ -33,6 +33,7 @@ import {
   MatrixRain,
   DepthZoom,
   ShatterReveal,
+  CardStack3D,
 } from './index';
 
 type BlockDef = {
@@ -91,6 +92,7 @@ const BLOCKS: BlockDef[] = [
   { id: 'Block-MatrixRain', component: MatrixRain, defaultProps: { text: 'ACCESS GRANTED', fontSize: 180, rainColor: '#00ff41', columns: 60 } },
   { id: 'Block-DepthZoom', component: DepthZoom, defaultProps: { text: 'Come closer', subtext: 'INTO FOCUS', fontSize: 220, durationInFrames: 60 } },
   { id: 'Block-ShatterReveal', component: ShatterReveal, defaultProps: { text: 'Impact', fontSize: 260, shardCount: 24 } },
+  { id: 'Block-CardStack3D', component: CardStack3D, defaultProps: { text: 'Built in 3D', subtext: 'PRODUCT SHOT', accentColor1: '#ff7a00', accentColor2: '#00d4ff' } },
 ];
 
 export const BlockCompositions: React.FC = () => (

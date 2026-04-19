@@ -388,5 +388,19 @@ module.exports = {
       shardCount: { type: 'number', default: 24 },
       durationInFrames: { type: 'number', default: 40 }
     }
+  },
+  CardStack3D: {
+    category: 'premium',
+    description: 'Three floating glass cards in 3D perspective with glowing neon outlines, orbital particles and starfield. Product-shot feel — good for feature reveals and hero scenes.',
+    props: {
+      text: { type: 'string', default: 'Built in 3D' },
+      subtext: { type: 'string', default: '' },
+      cards: { type: 'array<{icon,label,color?}>', default: [{ icon: '◎', label: 'Design' }, { icon: '⚡', label: 'Build' }, { icon: '➤', label: 'Ship' }] },
+      accentColor1: { type: 'hex', default: '#ff7a00' },
+      accentColor2: { type: 'hex', default: '#00d4ff' },
+      background: { type: 'hex', default: '#030614' },
+      fontSize: { type: 'number', default: 120 },
+      color: { type: 'hex', default: '#ffffff' }
+    }
   }
 };

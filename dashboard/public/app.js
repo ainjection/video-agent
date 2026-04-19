@@ -86,11 +86,18 @@ async function analyzeBriefFile(f) {
 function renderBriefResult(d) {
   const el = document.getElementById('briefResult');
   const mood = d.mood;
+  const feasLabel = { high: '✓ Achievable', medium: '⚠ Partial', low: '✗ Out of scope' }[d.feasibility] || '';
+  const feasColor = { high: 'var(--accent)', medium: '#f59e0b', low: '#ef4444' }[d.feasibility] || 'var(--muted)';
+  const feasBlock = d.feasibility && d.feasibility !== 'high' ? `
+    <div style="background:rgba(245,158,11,0.08);border:1px solid ${feasColor};border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;line-height:1.5">
+      <div style="font-weight:700;color:${feasColor};margin-bottom:4px">${feasLabel}</div>
+      <div>${escapeHtml(d.feasibilityNote || 'This reference exceeds what our blocks can produce. The matched mood is the closest approximation — expect the output to differ significantly from the reference.')}</div>
+    </div>` : '';
   const moodCard = mood ? `
     <div style="display:flex;gap:14px;align-items:stretch;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px">
       <div style="width:80px;height:80px;border-radius:8px;background:linear-gradient(135deg, ${escapeAttr(mood.palette.bg1)} 0%, ${escapeAttr(mood.palette.accent)} 60%, ${escapeAttr(mood.palette.text)} 100%);flex-shrink:0"></div>
       <div style="flex:1">
-        <div style="font-size:11px;color:var(--accent);font-weight:800;letter-spacing:0.15em">MATCHED MOOD</div>
+        <div style="font-size:11px;color:var(--accent);font-weight:800;letter-spacing:0.15em">MATCHED MOOD ${feasLabel ? `· <span style="color:${feasColor}">${feasLabel}</span>` : ''}</div>
         <div style="font-size:17px;font-weight:700;margin:3px 0">${escapeHtml(mood.name)}</div>
         <div style="font-size:12px;color:var(--muted);line-height:1.4">${escapeHtml(d.matchedReason || mood.description)}</div>
       </div>
@@ -105,6 +112,7 @@ function renderBriefResult(d) {
     </div>` : '';
 
   el.innerHTML = `
+    ${feasBlock}
     ${moodCard}
     <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px">
       <div style="font-size:11px;color:var(--muted);letter-spacing:0.15em;font-weight:800;text-transform:uppercase;margin-bottom:12px">DESIGN ANALYSIS</div>

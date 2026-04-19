@@ -32,7 +32,14 @@ Describe it using precise design language. Cover:
 - Motion cues if implied (zoom, pan, cut, static)
 - Mood in 3-5 adjectives
 
-Then match it to ONE of these moods that best fits:
+Also assess FEASIBILITY — our moods produce animated text on a stylised background. We CANNOT recreate:
+- Full 3D scenes or product renders made in Blender/Cinema4D
+- Photographic content, live-action footage, people, real locations
+- Custom illustrations, hand-drawn elements, 2D character animation
+
+We CAN produce (closely): animated text, kinetic typography, code/terminal reveals, chromatic VHS, matrix rain, floating 3D glass cards with glowing outlines (via CardStack3D), glassmorphism cards, shatter reveals.
+
+Then match to ONE of these moods that best fits:
 ${catalog}
 
 Reply with ONLY valid JSON in this shape, nothing else:
@@ -44,7 +51,9 @@ Reply with ONLY valid JSON in this shape, nothing else:
   "motion": "...",
   "adjectives": ["...","...","..."],
   "matchedMoodId": "one of the ids above",
-  "matchedReason": "one sentence why this mood fits"
+  "matchedReason": "one sentence why this mood fits",
+  "feasibility": "high" | "medium" | "low",
+  "feasibilityNote": "if medium/low, one sentence on what isn't achievable (e.g. 'reference is a photo-realistic 3D render; we can approximate the glass-card look but not the physical materials')"
 }`;
 }
 

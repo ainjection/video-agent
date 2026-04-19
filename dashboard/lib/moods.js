@@ -114,6 +114,19 @@ const MOODS = [
     textTransform: 'none'
   },
   {
+    id: 'product-shot-3d',
+    name: '3D Product Shot',
+    description: 'Floating glass cards in deep space with glowing neon outlines (orange + cyan), starfield, orbital particles. Feature-reveal product-launch feel.',
+    palette: { text: '#ffffff', accent: '#00d4ff', bg1: '#030614', bg2: '#0a0a1f' },
+    blockRotation: ['CardStack3D', 'CardStack3D', 'DepthZoom', 'CardStack3D'],
+    accentRotation: ['#ff7a00', '#00d4ff', '#ff0080'],
+    fontSize: 120,
+    pacing: 1.2,
+    bgBlock: 'SolidColor',
+    bgProps: { color: '#030614' },
+    textTransform: 'none'
+  },
+  {
     id: 'vaporwave',
     name: 'Vaporwave Nostalgic',
     description: 'Pink + teal palette, VHS scanlines, dreamy chromatic aberration. A E S T H E T I C.',
@@ -259,6 +272,12 @@ function applyMoodToSentences({ sentences, mood }) {
         break;
       case 'ShatterReveal':
         blockProps.durationInFrames = 50;
+        break;
+      case 'CardStack3D':
+        blockProps.accentColor1 = '#ff7a00';
+        blockProps.accentColor2 = '#00d4ff';
+        blockProps.background = mood.palette.bg1;
+        blockProps.subtext = '';
         break;
       case 'TerminalWindow':
         blockProps.lines = [displayText];
