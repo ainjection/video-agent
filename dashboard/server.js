@@ -174,9 +174,13 @@ const server = http.createServer((req, res) => {
         const { publicUrl, accountIds, caption } = JSON.parse(body || '{}');
         if (!publicUrl) return send(res, 400, { error: 'publicUrl required (upload the MP4 somewhere reachable first)' });
         if (!Array.isArray(accountIds) || accountIds.length === 0) return send(res, 400, { error: 'accountIds required' });
-        const src = await uploadBlotato.uploadVideo(publicUrl);
-        const post = await uploadBlotato.createPost({ accountIds, caption, videoSourceId: src.id });
-        send(res, 200, { ok: true, source: src, post });
+        // Need the full account records so we know each one's platform.
+        const allAccounts = await uploadBlotato.listAccounts();
+        const selected = allAccounts.filter(a => accountIds.includes(String(a.id)) || accountIds.includes(a.id));
+        if (!selected.length) return send(res, 400, { error: 'selected accounts not found in Blotato' });
+        const results = await uploadBlotato.publishToAccounts({ accounts: selected, publicUrl, caption });
+        const anyFailed = results.some(r => !r.ok);
+        send(res, anyFailed ? 207 : 200, { ok: !anyFailed, results });
       } catch (err) {
         send(res, 500, { error: err.message });
       }

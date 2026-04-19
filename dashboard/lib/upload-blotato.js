@@ -1,6 +1,5 @@
-// Minimal Blotato API client for publishing finished renders to social
-// platforms. Reuses the resolveKey helper so BLOTATO_API_KEY can live in
-// the project's .env or the ambient shell env.
+// Minimal Blotato API client — POST /v2/posts with account + media URL.
+// Shape mirrors Rob's production remotion-automation server.mjs.
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
@@ -45,7 +44,7 @@ function api({ method, path: p, body }) {
         try {
           const parsed = buf ? JSON.parse(buf) : {};
           if (res.statusCode >= 200 && res.statusCode < 300) resolve(parsed);
-          else reject(new Error(`Blotato ${res.statusCode}: ${buf.slice(0, 300)}`));
+          else reject(new Error(`Blotato ${res.statusCode}: ${JSON.stringify(parsed).slice(0, 400)}`));
         } catch {
           reject(new Error(`Blotato parse error: ${buf.slice(0, 300)}`));
         }
@@ -62,28 +61,62 @@ async function listAccounts() {
   return res.items || res.accounts || res;
 }
 
-async function uploadVideo(publicUrl) {
-  // Simple path: ask Blotato to ingest a publicly-reachable URL as a source.
-  // (Caller must expose the local MP4 via a public URL first — ngrok,
-  // tunnel, or already-uploaded storage.)
-  const src = await api({ method: 'POST', path: '/sources', body: { url: publicUrl, type: 'video' } });
-  return src;
+// Target defaults per platform. Blotato insists on these; minimal safe values.
+function defaultTargetForPlatform(platform, caption) {
+  switch (platform) {
+    case 'youtube':
+      return { targetType: 'youtube', title: (caption || 'Video').slice(0, 95), privacyStatus: 'public', shouldNotifySubscribers: true };
+    case 'tiktok':
+      return { targetType: 'tiktok', privacyLevel: 'PUBLIC_TO_EVERYONE', disabledComments: false, disabledDuet: false, disabledStitch: false, isBrandedContent: false, isYourBrand: false, isAiGenerated: true };
+    case 'instagram':
+      return { targetType: 'instagram' };
+    case 'facebook':
+      return { targetType: 'facebook' };
+    case 'twitter':
+    case 'x':
+      return { targetType: 'twitter' };
+    case 'threads':
+      return { targetType: 'threads' };
+    case 'linkedin':
+      return { targetType: 'linkedin' };
+    default:
+      return { targetType: platform };
+  }
 }
 
-async function createPost({ accountIds, caption, videoSourceId }) {
-  return api({
-    method: 'POST',
-    path: '/posts',
-    body: {
-      accountIds,
-      content: caption || '',
-      media: videoSourceId ? [{ sourceId: videoSourceId, type: 'video' }] : []
+// Submit one post per selected account. Each account has its own platform,
+// so we look up the platform from the account record.
+async function publishToAccounts({ accounts, publicUrl, caption }) {
+  const results = [];
+  for (const acc of accounts) {
+    const platform = acc.platform;
+    if (!platform) {
+      results.push({ accountId: acc.id, error: 'no platform on account record' });
+      continue;
     }
-  });
+    const postBody = {
+      post: {
+        accountId: String(acc.id),
+        content: {
+          text: caption || '',
+          mediaUrls: [publicUrl],
+          platform
+        },
+        target: defaultTargetForPlatform(platform, caption)
+      }
+    };
+    try {
+      const data = await api({ method: 'POST', path: '/posts', body: postBody });
+      results.push({ accountId: acc.id, platform, ok: true, postSubmissionId: data.postSubmissionId || data.id });
+    } catch (err) {
+      results.push({ accountId: acc.id, platform, ok: false, error: err.message });
+    }
+  }
+  return results;
 }
 
 function hasKey() {
   return !!resolveKey('BLOTATO_API_KEY');
 }
 
-module.exports = { listAccounts, uploadVideo, createPost, hasKey };
+module.exports = { listAccounts, publishToAccounts, hasKey };

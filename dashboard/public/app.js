@@ -2395,9 +2395,15 @@ async function showUploadModal(filename, label) {
         body: JSON.stringify({ publicUrl, accountIds, caption })
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'publish failed');
-      alert('✓ Queued to Blotato.');
-      modal.remove();
+      if (!res.ok && !data.results) throw new Error(data.error || 'publish failed');
+      const results = data.results || [];
+      const ok = results.filter(r => r.ok);
+      const bad = results.filter(r => !r.ok);
+      let msg = '';
+      if (ok.length) msg += `✓ Posted to ${ok.length} account${ok.length > 1 ? 's' : ''} (${ok.map(r => r.platform).join(', ')}).`;
+      if (bad.length) msg += (msg ? '\n\n' : '') + `✗ Failed: ${bad.map(r => `${r.platform || r.accountId}: ${r.error}`).join('\n')}`;
+      alert(msg || '✓ Submitted.');
+      if (!bad.length) modal.remove();
     } catch (err) {
       alert('Publish failed: ' + err.message);
     }
