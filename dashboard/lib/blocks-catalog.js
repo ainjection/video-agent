@@ -308,5 +308,85 @@ module.exports = {
       staggerFrames: { type: 'number', default: 4 },
       maxLogoHeight: { type: 'number', default: 80 }
     }
+  },
+  KineticTypography: {
+    category: 'premium',
+    description: 'Each word arrives on a different motion path (up/down/left/right/flip/rotate/scale) with spring physics. Premium kinetic feel.',
+    props: {
+      text: { type: 'string', required: true },
+      fontSize: { type: 'number', default: 130 },
+      color: { type: 'hex', default: '#ffffff' },
+      accentColor: { type: 'hex', default: '#00e676' },
+      wordsPerSecond: { type: 'number', default: 2.2 },
+      align: { type: 'left|center|right', default: 'center' }
+    }
+  },
+  GlassmorphismCard: {
+    category: 'premium',
+    description: 'Frosted-glass card with animated colour blobs behind, shimmer sweep, headline + supporting line. Modern depth.',
+    props: {
+      text: { type: 'string', required: true },
+      subtext: { type: 'string', default: '' },
+      fontSize: { type: 'number', default: 160 },
+      color: { type: 'hex', default: '#ffffff' },
+      accentColor: { type: 'hex', default: '#00e676' },
+      bgColors: { type: 'array<hex>', default: ['#0f172a', '#3b0764', '#0f172a'] },
+      width: { type: 'number', default: 1200 },
+      height: { type: 'number', default: 600 }
+    }
+  },
+  ChromaticScanline: {
+    category: 'premium',
+    description: 'VHS / broadcast treatment — RGB chromatic aberration, scanlines, noise flicker, CRT vignette. Retro-tech intro.',
+    props: {
+      text: { type: 'string', required: true },
+      fontSize: { type: 'number', default: 200 },
+      color: { type: 'hex', default: '#ffffff' },
+      background: { type: 'hex', default: '#050505' },
+      rgbOffset: { type: 'number', default: 8 },
+      scanlineOpacity: { type: 'number', default: 0.25 },
+      noiseIntensity: { type: 'number', default: 0.15 }
+    }
+  },
+  MatrixRain: {
+    category: 'premium',
+    description: 'Classic green matrix character rain as a background, with a boxed headline glowing on top. Hacker / access-granted vibe.',
+    props: {
+      text: { type: 'string', required: true },
+      fontSize: { type: 'number', default: 180 },
+      color: { type: 'hex', default: '#ffffff' },
+      rainColor: { type: 'hex', default: '#00ff41' },
+      headColor: { type: 'hex', default: '#aaffaa' },
+      background: { type: 'hex', default: '#050505' },
+      columns: { type: 'number', default: 60 },
+      speed: { type: 'number', default: 1.2 }
+    }
+  },
+  DepthZoom: {
+    category: 'premium',
+    description: 'Slow 3D zoom with blur racking to focus — like a lens coming into focus. Cinematic cold-open feel.',
+    props: {
+      text: { type: 'string', required: true },
+      subtext: { type: 'string', default: '' },
+      fontSize: { type: 'number', default: 220 },
+      color: { type: 'hex', default: '#ffffff' },
+      background: { type: 'hex', default: '#0a0a0a' },
+      zoomFrom: { type: 'number', default: 0.6 },
+      zoomTo: { type: 'number', default: 1.05 },
+      blurFrom: { type: 'number', default: 30 },
+      blurTo: { type: 'number', default: 0 },
+      durationInFrames: { type: 'number', default: 60 }
+    }
+  },
+  ShatterReveal: {
+    category: 'premium',
+    description: 'Text pieces fly in from random directions and assemble into the final headline. Impact / punchline moments.',
+    props: {
+      text: { type: 'string', required: true },
+      fontSize: { type: 'number', default: 260 },
+      color: { type: 'hex', default: '#ffffff' },
+      shardCount: { type: 'number', default: 24 },
+      durationInFrames: { type: 'number', default: 40 }
+    }
   }
 };
