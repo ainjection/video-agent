@@ -25,6 +25,7 @@ const fork = require('./lib/fork');
 const setup = require('./lib/setup');
 const aiThumbnail = require('./lib/ai-thumbnail');
 const uploadBlotato = require('./lib/upload-blotato');
+const uploadCatbox = require('./lib/upload-catbox');
 const subtitles = require('./lib/subtitles');
 const scriptToVideo = require('./lib/script-to-video');
 const IMAGES_DIR = path.join(__dirname, 'data', 'images');
@@ -133,6 +134,24 @@ const server = http.createServer((req, res) => {
         const outputMp4 = path.join(outDir, outName);
         const result = await subtitles.burnSubtitles({ inputMp4, outputMp4 });
         send(res, 200, { ok: true, filename: outName, wordCount: result.wordCount });
+      } catch (err) {
+        send(res, 500, { error: err.message });
+      }
+    });
+  }
+
+  // Upload a local MP4 to catbox.moe to get a public URL (handy for
+  // Blotato publish, which needs a URL to ingest from).
+  if (pathname === '/api/upload/catbox' && req.method === 'POST') {
+    return readBody(req, async (body) => {
+      try {
+        const { filename } = JSON.parse(body || '{}');
+        if (!filename || filename.includes('..') || filename.includes('/')) return send(res, 400, { error: 'filename required (bare mp4 name)' });
+        const outDir = path.join(__dirname, '..', 'out');
+        const filePath = path.join(outDir, filename);
+        if (!fs.existsSync(filePath)) return send(res, 404, { error: 'file not found in out/' });
+        const result = await uploadCatbox.uploadToCatbox(filePath);
+        send(res, 200, { ok: true, url: result.url });
       } catch (err) {
         send(res, 500, { error: err.message });
       }

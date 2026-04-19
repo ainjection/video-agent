@@ -2329,7 +2329,11 @@ async function showUploadModal(filename, label) {
       <p style="color:var(--muted);font-size:12px;margin:0 0 18px 0">Blotato will ingest your MP4 from a public URL. Upload to Drive/S3/ngrok first, then paste the direct URL.</p>
       <form id="uploadForm" style="display:flex;flex-direction:column;gap:14px">
         <label style="display:block"><span style="font-size:12px;font-weight:600">Public video URL</span>
-          <input name="publicUrl" type="url" placeholder="https://…/${escapeAttr(filename)}" required style="width:100%;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:12px;margin-top:4px">
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <input name="publicUrl" type="url" placeholder="https://… or click Auto-upload →" required style="flex:1;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:12px">
+            <button type="button" id="catboxUpload" class="btn" style="white-space:nowrap">⬆ Auto-upload</button>
+          </div>
+          <div style="font-size:10px;color:var(--muted);margin-top:4px">Auto-upload sends the MP4 to catbox.moe (free anonymous video host, permanent URL).</div>
         </label>
         <label style="display:block"><span style="font-size:12px;font-weight:600">Caption</span>
           <textarea name="caption" rows="3" placeholder="Post caption…" style="width:100%;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:12px;margin-top:4px"></textarea>
@@ -2353,6 +2357,30 @@ async function showUploadModal(filename, label) {
     </div>`;
   document.body.appendChild(modal);
   document.getElementById('uploadCancel').onclick = () => modal.remove();
+  document.getElementById('catboxUpload').onclick = async (e) => {
+    e.preventDefault();
+    const btn = e.currentTarget;
+    const urlInput = modal.querySelector('input[name="publicUrl"]');
+    const orig = btn.textContent;
+    btn.textContent = '⏳ Uploading…';
+    btn.disabled = true;
+    try {
+      const res = await fetch('/api/upload/catbox', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'upload failed');
+      urlInput.value = data.url;
+      btn.textContent = '✓ Uploaded';
+      setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 2000);
+    } catch (err) {
+      alert('Catbox upload failed: ' + err.message);
+      btn.textContent = orig;
+      btn.disabled = false;
+    }
+  };
   document.getElementById('uploadForm').onsubmit = async (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
