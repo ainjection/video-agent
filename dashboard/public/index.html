@@ -45,6 +45,9 @@
         <button class="nav-item" data-view="moods">
           <span class="nav-icon">🎭</span> Mood Library
         </button>
+        <button class="nav-item" data-view="brief">
+          <span class="nav-icon">🎨</span> Visual Brief
+        </button>
         <button class="nav-item" data-view="daily">
           <span class="nav-icon">🤖</span> Daily Render
         </button>
@@ -304,6 +307,27 @@
           </div>
 
           <div id="importStatus" class="import-status"></div>
+        </div>
+      </section>
+
+      <!-- VISUAL BRIEF -->
+      <section class="view hidden" data-view="brief">
+        <header class="view-header">
+          <h1>Visual Brief</h1>
+          <div class="muted">Drop a still from a video you love. Gemini Vision describes the style in design language and matches it to one of your moods.</div>
+        </header>
+        <div class="import-form">
+          <div id="briefDrop" style="border:2px dashed var(--border);border-radius:12px;padding:40px;text-align:center;cursor:pointer;transition:border-color 0.2s;background:var(--panel)">
+            <div style="font-size:40px;margin-bottom:8px">🎨</div>
+            <div style="font-weight:600;font-size:15px;margin-bottom:4px">Drop a reference image</div>
+            <div class="muted" style="font-size:11px">JPEG / PNG / WebP · up to ~10MB. Click to pick a file.</div>
+            <input type="file" id="briefFile" accept="image/*" style="display:none">
+          </div>
+          <div id="briefPreview" style="display:none;margin-top:16px">
+            <img id="briefImg" style="max-width:100%;border-radius:8px;border:1px solid var(--border)">
+          </div>
+          <div id="briefStatus" style="margin-top:12px"></div>
+          <div id="briefResult" style="margin-top:16px"></div>
         </div>
       </section>
 

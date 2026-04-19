@@ -29,6 +29,7 @@ const uploadCatbox = require('./lib/upload-catbox');
 const subtitles = require('./lib/subtitles');
 const scriptToVideo = require('./lib/script-to-video');
 const moods = require('./lib/moods');
+const visualBrief = require('./lib/visual-brief');
 const IMAGES_DIR = path.join(__dirname, 'data', 'images');
 const REMOTION_IMAGES_DIR = path.join(__dirname, '..', 'public', 'images');
 const AUDIO_DIR = path.join(__dirname, 'data', 'audio');
@@ -96,6 +97,21 @@ const server = http.createServer((req, res) => {
     } catch (err) {
       return send(res, 500, { error: err.message });
     }
+  }
+
+  // Visual Brief — analyse a reference image with Gemini Vision, return
+  // a design-language description + matched mood id.
+  if (pathname === '/api/brief/analyze' && req.method === 'POST') {
+    return readBody(req, async (body) => {
+      try {
+        const { imageBase64, mimeType } = JSON.parse(body || '{}');
+        if (!imageBase64) return send(res, 400, { error: 'imageBase64 required' });
+        const analysis = await visualBrief.analyze({ imageBase64, mimeType });
+        send(res, 200, analysis);
+      } catch (err) {
+        send(res, 500, { error: err.message });
+      }
+    });
   }
 
   // Mood Library — 12 curated visual styles. Each locks in palette,

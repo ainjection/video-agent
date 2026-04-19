@@ -31,8 +31,91 @@ async function init() {
   wireCleanup();
   wireScriptToVideo();
   wireMoodLibrary();
+  wireVisualBrief();
   pollThumbnails();
   checkSetup();
+}
+
+function wireVisualBrief() {
+  const drop = document.getElementById('briefDrop');
+  const file = document.getElementById('briefFile');
+  if (!drop || !file) return;
+  drop.addEventListener('click', () => file.click());
+  drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.style.borderColor = 'var(--accent)'; });
+  drop.addEventListener('dragleave', () => { drop.style.borderColor = 'var(--border)'; });
+  drop.addEventListener('drop', (e) => {
+    e.preventDefault();
+    drop.style.borderColor = 'var(--border)';
+    if (e.dataTransfer.files.length) analyzeBriefFile(e.dataTransfer.files[0]);
+  });
+  file.addEventListener('change', (e) => { if (e.target.files.length) analyzeBriefFile(e.target.files[0]); });
+}
+
+async function analyzeBriefFile(f) {
+  if (!f.type.startsWith('image/')) return alert('Please drop an image file.');
+  const img = document.getElementById('briefImg');
+  const preview = document.getElementById('briefPreview');
+  const statusEl = document.getElementById('briefStatus');
+  const resultEl = document.getElementById('briefResult');
+  preview.style.display = 'block';
+  statusEl.innerHTML = '<div class="muted" style="font-family:monospace;font-size:12px">⏳ Analysing with Gemini Vision…</div>';
+  resultEl.innerHTML = '';
+
+  const reader = new FileReader();
+  reader.onload = async () => {
+    const dataUrl = reader.result;
+    img.src = dataUrl;
+    const base64 = dataUrl.split(',')[1];
+    try {
+      const res = await fetch('/api/brief/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageBase64: base64, mimeType: f.type })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'analyze failed');
+      renderBriefResult(data);
+      statusEl.innerHTML = '';
+    } catch (err) {
+      statusEl.innerHTML = `<div style="color:var(--danger);font-family:monospace;font-size:12px">✗ ${escapeHtml(err.message)}</div>`;
+    }
+  };
+  reader.readAsDataURL(f);
+}
+
+function renderBriefResult(d) {
+  const el = document.getElementById('briefResult');
+  const mood = d.mood;
+  const moodCard = mood ? `
+    <div style="display:flex;gap:14px;align-items:stretch;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px">
+      <div style="width:80px;height:80px;border-radius:8px;background:linear-gradient(135deg, ${escapeAttr(mood.palette.bg1)} 0%, ${escapeAttr(mood.palette.accent)} 60%, ${escapeAttr(mood.palette.text)} 100%);flex-shrink:0"></div>
+      <div style="flex:1">
+        <div style="font-size:11px;color:var(--accent);font-weight:800;letter-spacing:0.15em">MATCHED MOOD</div>
+        <div style="font-size:17px;font-weight:700;margin:3px 0">${escapeHtml(mood.name)}</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.4">${escapeHtml(d.matchedReason || mood.description)}</div>
+      </div>
+      <button class="btn primary" style="align-self:center" onclick="applyMoodToScript('${escapeAttr(mood.id)}', '${escapeAttr(mood.name)}')">Apply to Script →</button>
+    </div>
+  ` : '';
+
+  const field = (label, value) => value ? `
+    <div style="margin-bottom:10px">
+      <div style="font-size:10px;letter-spacing:0.15em;color:var(--accent);font-weight:800;text-transform:uppercase;margin-bottom:3px">${label}</div>
+      <div style="font-size:12px;line-height:1.5">${escapeHtml(value)}</div>
+    </div>` : '';
+
+  el.innerHTML = `
+    ${moodCard}
+    <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px">
+      <div style="font-size:11px;color:var(--muted);letter-spacing:0.15em;font-weight:800;text-transform:uppercase;margin-bottom:12px">DESIGN ANALYSIS</div>
+      ${field('Palette', d.palette)}
+      ${field('Typography', d.typography)}
+      ${field('Layout', d.layout)}
+      ${field('Treatment', d.treatment)}
+      ${field('Motion', d.motion)}
+      ${d.adjectives ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">${d.adjectives.map(a => `<span style="background:var(--panel-2);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:10px;text-transform:uppercase;letter-spacing:0.1em">${escapeHtml(a)}</span>`).join('')}</div>` : ''}
+    </div>
+  `;
 }
 
 function wireMoodLibrary() {
