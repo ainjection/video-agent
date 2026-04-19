@@ -33,6 +33,9 @@ public/script-vo/
 meshy-source-images/
 public/hero-library/_preview*.png
 
+# Pro bundle output (produced by `npm run bundle`)
+dist-bundle/
+
 # Editor / OS
 .vscode
 *.log

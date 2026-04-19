@@ -31,7 +31,8 @@
     "build": "remotion bundle",
     "upgrade": "remotion upgrade",
     "lint": "eslint src && tsc",
-    "dashboard": "node --no-deprecation dashboard/server.js"
+    "dashboard": "node --no-deprecation dashboard/server.js",
+    "bundle": "node scripts/bundle.js"
   },
   "sideEffects": [
     "*.css"
