@@ -36,6 +36,43 @@ async function init() {
   checkSetup();
 }
 
+async function loadHeroLibrary() {
+  const grid = document.getElementById('heroGrid');
+  const refreshBtn = document.getElementById('heroRefresh');
+  if (!grid) return;
+  if (refreshBtn && !refreshBtn.__wired) {
+    refreshBtn.addEventListener('click', loadHeroLibrary);
+    refreshBtn.__wired = true;
+  }
+  grid.innerHTML = '<div style="color:var(--muted);padding:20px">Loading…</div>';
+  try {
+    const res = await fetch('/api/hero/list');
+    const { clips } = await res.json();
+    if (!clips.length) {
+      grid.innerHTML = `<div style="grid-column:1/-1;color:var(--muted);padding:40px;text-align:center;background:var(--panel);border:1px dashed var(--border);border-radius:12px">
+        <div style="font-size:48px;margin-bottom:12px">🦸</div>
+        <div style="font-weight:700;margin-bottom:6px">No hero clips yet</div>
+        <div style="font-size:12px;line-height:1.6">Drop MP4s into <code>public/hero-library/</code> and optionally edit <code>public/hero-library/manifest.json</code> to name + describe them. The Blender hero scenes we're about to render will land here.</div>
+      </div>`;
+      return;
+    }
+    grid.innerHTML = clips.map(c => `
+      <div class="hero-card" style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px">
+        <video src="/hero/${encodeURIComponent(c.filename)}" autoplay muted loop playsinline style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;background:#000"></video>
+        <div style="font-size:14px;font-weight:700">${escapeHtml(c.name)}</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.4;min-height:30px">${escapeHtml(c.description || '')}</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;font-size:10px">
+          ${c.category ? `<span style="background:var(--panel-2);padding:2px 6px;border-radius:4px;color:var(--accent)">${escapeHtml(c.category)}</span>` : ''}
+          ${c.source ? `<span style="background:var(--panel-2);padding:2px 6px;border-radius:4px;color:var(--muted)">${escapeHtml(c.source)}</span>` : ''}
+          ${(c.tags || []).map(t => `<span style="background:var(--panel-2);padding:2px 6px;border-radius:4px;color:var(--muted)">#${escapeHtml(t)}</span>`).join('')}
+        </div>
+      </div>
+    `).join('');
+  } catch (err) {
+    grid.innerHTML = `<div style="color:var(--danger)">Load failed: ${escapeHtml(err.message)}</div>`;
+  }
+}
+
 function wireVisualBrief() {
   const drop = document.getElementById('briefDrop');
   const file = document.getElementById('briefFile');
@@ -1624,6 +1661,7 @@ function wireNav() {
       if (view === 'timeline') { renderTimelineLibrary(); renderTimelineUI(); refreshProjectPicker(); }
       if (view === 'maintenance') loadCleanupStatus();
       if (view === 'moods') loadMoods();
+      if (view === 'hero') loadHeroLibrary();
     });
   });
 }

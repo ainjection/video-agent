@@ -30,6 +30,7 @@ const subtitles = require('./lib/subtitles');
 const scriptToVideo = require('./lib/script-to-video');
 const moods = require('./lib/moods');
 const visualBrief = require('./lib/visual-brief');
+const heroLibrary = require('./lib/hero-library');
 const IMAGES_DIR = path.join(__dirname, 'data', 'images');
 const REMOTION_IMAGES_DIR = path.join(__dirname, '..', 'public', 'images');
 const AUDIO_DIR = path.join(__dirname, 'data', 'audio');
@@ -97,6 +98,38 @@ const server = http.createServer((req, res) => {
     } catch (err) {
       return send(res, 500, { error: err.message });
     }
+  }
+
+  // Hero Library — pre-rendered MP4 clips (Blender / AI video gen) that
+  // can be dropped into the timeline or used as hero scenes.
+  if (pathname === '/api/hero/list' && req.method === 'GET') {
+    return send(res, 200, { clips: heroLibrary.listClips() });
+  }
+  if (pathname === '/api/hero/add' && req.method === 'POST') {
+    return readBody(req, (body) => {
+      try {
+        const data = JSON.parse(body || '{}');
+        const entry = heroLibrary.addClip(data);
+        send(res, 200, { ok: true, clip: entry });
+      } catch (err) {
+        send(res, 400, { error: err.message });
+      }
+    });
+  }
+  if (/^\/api\/hero\/remove\/[^/]+$/.test(pathname) && req.method === 'POST') {
+    const id = decodeURIComponent(pathname.split('/').pop());
+    heroLibrary.removeClip(id);
+    return send(res, 200, { ok: true });
+  }
+  if (pathname.startsWith('/hero/') && req.method === 'GET') {
+    const name = decodeURIComponent(pathname.replace('/hero/', ''));
+    if (name.includes('..') || name.includes('/')) return send(res, 400, { error: 'bad path' });
+    const filePath = path.join(heroLibrary.HERO_DIR, name);
+    if (!fs.existsSync(filePath)) return send(res, 404, { error: 'not found' });
+    const ext = path.extname(filePath).toLowerCase();
+    const type = ext === '.mp4' ? 'video/mp4' : ext === '.png' ? 'image/png' : ext === '.jpg' ? 'image/jpeg' : 'application/octet-stream';
+    res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-cache' });
+    return fs.createReadStream(filePath).pipe(res);
   }
 
   // Visual Brief — analyse a reference image with Gemini Vision, return
