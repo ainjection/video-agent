@@ -213,7 +213,20 @@ function wireScriptToVideo() {
         if (d.line) document.getElementById('scriptProgressLine').textContent = d.line;
         if (d.status === 'done') {
           es.close();
-          result.innerHTML = `<video src="/out/${encodeURIComponent(data.render.filename)}" controls autoplay style="width:100%;border-radius:8px;background:#000;margin-top:12px"></video>`;
+          const planRows = (data.scenes || []).map((s, i) => `
+            <tr>
+              <td style="padding:4px 8px;color:var(--muted)">${i + 1}</td>
+              <td style="padding:4px 8px;font-family:monospace;color:var(--accent)">${escapeHtml(s.block || 'BigHeadline')}</td>
+              <td style="padding:4px 8px">${escapeHtml(s.text)}</td>
+            </tr>`).join('');
+          const moodLine = data.runId ? `<div class="muted" style="font-size:11px;margin-bottom:6px">Run <code>${escapeHtml(data.runId)}</code>${state.scriptMoodId ? ` · mood <b>${escapeHtml(state.scriptMoodId)}</b>` : ''}</div>` : '';
+          result.innerHTML = `
+            ${moodLine}
+            <video src="/out/${encodeURIComponent(data.render.filename)}" controls autoplay style="width:100%;border-radius:8px;background:#000;margin-top:12px"></video>
+            <details style="margin-top:12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:10px 14px">
+              <summary style="cursor:pointer;font-size:12px;color:var(--muted)">Scene plan (${(data.scenes || []).length} scenes) — verify the mood's blocks were applied</summary>
+              <table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:8px"><tbody>${planRows}</tbody></table>
+            </details>`;
           btn.disabled = false;
         } else if (d.status === 'failed') {
           es.close();
