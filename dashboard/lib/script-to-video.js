@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const { randomUUID } = require('crypto');
 const { spawn } = require('child_process');
+const { chooseScenesForSentences } = require('./script-scenes-ai');
 
 const PROJECT_ROOT = path.join(__dirname, '..', '..');
 const PUBLIC_DIR = path.join(PROJECT_ROOT, 'public');
@@ -87,7 +88,7 @@ function probeDurationSeconds(audioPath) {
   });
 }
 
-async function buildScenes({ script, voiceId }) {
+async function buildScenes({ script, voiceId, style }) {
   if (!fs.existsSync(VO_DIR)) fs.mkdirSync(VO_DIR, { recursive: true });
   const sentences = splitSentences(script);
   if (!sentences.length) throw new Error('script is empty after sentence split');
@@ -95,17 +96,25 @@ async function buildScenes({ script, voiceId }) {
   const batchDir = path.join(VO_DIR, runId);
   fs.mkdirSync(batchDir, { recursive: true });
 
+  // Pick a block + props for each sentence (AI or preset rotation).
+  const picks = await chooseScenesForSentences({ sentences, style });
+
   const scenes = [];
   for (let i = 0; i < sentences.length; i++) {
     const text = sentences[i];
     const audioPath = path.join(batchDir, `${String(i).padStart(3, '0')}.mp3`);
     await ttsElevenLabs({ text, voiceId: voiceId || DEFAULT_VOICE, outPath: audioPath });
     const seconds = await probeDurationSeconds(audioPath);
-    // Add 0.4s breathing room after each sentence.
     const durationInFrames = Math.round((seconds + 0.4) * 30);
-    // Scene uses staticFile path relative to /public
     const relativeAudio = path.posix.join('script-vo', runId, `${String(i).padStart(3, '0')}.mp3`);
-    scenes.push({ text, audio: relativeAudio, durationInFrames });
+    const pick = picks[i] || {};
+    scenes.push({
+      text,
+      audio: relativeAudio,
+      durationInFrames,
+      block: pick.block || 'BigHeadline',
+      blockProps: pick.blockProps || {}
+    });
   }
   const totalFrames = scenes.reduce((sum, s) => sum + s.durationInFrames, 0);
   return { runId, scenes, totalFrames };

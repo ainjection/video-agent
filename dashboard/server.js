@@ -101,9 +101,9 @@ const server = http.createServer((req, res) => {
   if (pathname === '/api/script/build' && req.method === 'POST') {
     return readBody(req, async (body) => {
       try {
-        const { script, voiceId, fontSize, textColor, bgColors } = JSON.parse(body || '{}');
+        const { script, voiceId, fontSize, textColor, bgColors, style } = JSON.parse(body || '{}');
         if (!script || script.trim().length < 20) return send(res, 400, { error: 'script too short' });
-        const built = await scriptToVideo.buildScenes({ script, voiceId });
+        const built = await scriptToVideo.buildScenes({ script, voiceId, style });
         const render = renderer.startRender({
           compositionId: 'ScriptRunner',
           props: {

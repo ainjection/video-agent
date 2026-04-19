@@ -315,6 +315,16 @@
             <textarea id="scriptInput" rows="10" placeholder="I built a video workstation this weekend. It renders in seconds. The AI inside it writes working code. Let me show you."></textarea>
           </label>
           <div class="import-fields">
+            <label><span>Style</span>
+              <select id="scriptStyle">
+                <option value="Auto" selected>Auto (AI picks per scene)</option>
+                <option value="Cinematic">Cinematic (BlurIn + Reveal)</option>
+                <option value="Glitch">Glitch</option>
+                <option value="Bold">Bold (WordByWord + Split)</option>
+                <option value="Typewriter">Typewriter</option>
+                <option value="Minimal">Minimal</option>
+              </select>
+            </label>
             <label><span>Voice ID (ElevenLabs)</span><input id="scriptVoice" type="text" value="onwK4e9ZLuTAKqWW03F9"></label>
             <label><span>Font size</span><input id="scriptFontSize" type="number" value="140"></label>
             <label><span>Text colour</span><input id="scriptTextColor" type="color" value="#ffffff"></label>

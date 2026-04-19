@@ -45,7 +45,8 @@ function wireScriptToVideo() {
       voiceId: document.getElementById('scriptVoice').value.trim() || undefined,
       fontSize: parseInt(document.getElementById('scriptFontSize').value, 10) || 140,
       textColor: document.getElementById('scriptTextColor').value,
-      bgColors: [document.getElementById('scriptBg1').value, document.getElementById('scriptBg2').value]
+      bgColors: [document.getElementById('scriptBg1').value, document.getElementById('scriptBg2').value],
+      style: document.getElementById('scriptStyle').value
     };
     const panel = document.getElementById('scriptProgress');
     const result = document.getElementById('scriptResult');
