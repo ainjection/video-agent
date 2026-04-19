@@ -4,6 +4,8 @@ A local Remotion workstation with a click-and-tweak dashboard, AI code generatio
 
 https://github.com/ainjection/video-agent
 
+> **Pro pack available** — curated Blender-rendered hero clip library, the render scripts that made them, extra mood presets, and a 30-min setup walkthrough. Monthly drops thereafter. One-time purchase on Gumroad, lifetime access. [Details →](#pro-pack)
+
 ![Video Agent Dashboard](dashboard/out/thumbnail-0.png)
 
 ## What it is
@@ -84,9 +86,22 @@ Or just hit Render in the dashboard.
 5. A **Render Preview** button appears in the chat bubble. Click it — the file gets written, the composition bundles, the MP4 renders, the video plays inline.
 6. Approve → saved to the library. Discard → cleaned up with one click.
 
+## Pro pack
+
+Everything above is MIT and free forever. If you want to skip the production time and drop in ready-made hero content, the **Video Agent Pro** bundle includes:
+
+- **6 Blender-rendered hero MP4s** — 3D glass cards, holographic panels, runic monoliths, liquid neon ribbons, chrome statues. Drop into the timeline or use as the opening of a Script to Video render.
+- **The Blender Python that made them** — every hero script shipped as a standalone recipe you can tweak, swap assets into, or adapt.
+- **Mood Pack Pro** — additional curated visual moods beyond the 13 built in.
+- **Setup guide** — screenshots + short video to get running in 30 min.
+- **Private Skool community** — monthly new drops and office hours.
+- **Gumroad:** coming soon — watch this space or [star the repo](https://github.com/ainjection/video-agent/stargazers) to be notified.
+
+Personal-use commercial licence. Not resellable.
+
 ## Licence
 
-MIT. Do whatever.
+MIT. Do whatever with the free version above.
 
 ## Credits
 
