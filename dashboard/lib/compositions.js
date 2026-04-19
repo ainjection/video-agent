@@ -85,8 +85,11 @@ function buildImportMap(root) {
     if (defaultName) map[defaultName] = sourcePath;
     if (namedBlock) {
       namedBlock.split(',').forEach(part => {
-        const name = part.trim().split(/\s+as\s+/)[0].trim();
-        if (name) map[name] = sourcePath;
+        // For "Foo as Bar", Bar is the local binding — that's the name used
+        // as the component reference, so it's the key we need in the map.
+        const [original, alias] = part.trim().split(/\s+as\s+/).map(s => s.trim());
+        const localName = alias || original;
+        if (localName) map[localName] = sourcePath;
       });
     }
   }
