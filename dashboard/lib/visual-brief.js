@@ -61,7 +61,11 @@ async function analyze({ imageBase64, mimeType = 'image/jpeg' }) {
         { inline_data: { mime_type: mimeType, data: imageBase64 } }
       ]
     }],
-    generationConfig: { temperature: 0.4, maxOutputTokens: 800 }
+    generationConfig: {
+      temperature: 0.4,
+      maxOutputTokens: 2000,
+      responseMimeType: 'application/json'
+    }
   });
 
   return new Promise((resolve, reject) => {
@@ -80,9 +84,24 @@ async function analyze({ imageBase64, mimeType = 'image/jpeg' }) {
             return reject(new Error(`Gemini ${res.statusCode}: ${buf.slice(0, 400)}`));
           }
           const text = (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('');
-          const match = text.match(/\{[\s\S]*\}/);
-          if (!match) return reject(new Error('Gemini returned no JSON: ' + text.slice(0, 300)));
-          const parsed = JSON.parse(match[0]);
+          const finishReason = data.candidates?.[0]?.finishReason;
+          // responseMimeType: application/json should give us clean JSON,
+          // but fall back to regex extraction if it doesn't.
+          let parsed;
+          try {
+            parsed = JSON.parse(text);
+          } catch {
+            const match = text.match(/\{[\s\S]*\}/);
+            if (!match) {
+              const hint = finishReason === 'MAX_TOKENS' ? ' (model hit max_tokens — response was cut off; try a smaller image or retry)' : '';
+              return reject(new Error(`Gemini returned no valid JSON${hint}: ${text.slice(0, 300)}`));
+            }
+            try {
+              parsed = JSON.parse(match[0]);
+            } catch (err) {
+              return reject(new Error(`Gemini JSON parse failed: ${err.message}. Raw: ${text.slice(0, 300)}`));
+            }
+          }
           // Attach the full mood object so the frontend can preview palette.
           const mood = parsed.matchedMoodId ? moods.get(parsed.matchedMoodId) : null;
           resolve({ ...parsed, mood });
