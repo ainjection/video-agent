@@ -48,6 +48,7 @@ import { PaperclipTest2 } from "./PaperclipTest2";
 import { Opus47PaperclipIntro } from "./Opus47PaperclipIntro";
 import { BlockCompositions } from "./blocks/register";
 import { ScriptRunner } from "./ScriptRunner";
+import { HeroCompositions } from "./hero-register";
 
 
 
