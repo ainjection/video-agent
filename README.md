@@ -95,7 +95,7 @@ Everything above is MIT and free forever. If you want to skip the production tim
 - **Mood Pack Pro** — additional curated visual moods beyond the 13 built in.
 - **Setup guide** — screenshots + short video to get running in 30 min.
 - **Private Skool community** — monthly new drops and office hours.
-- **Gumroad:** coming soon — watch this space or [star the repo](https://github.com/ainjection/video-agent/stargazers) to be notified.
+- **Get the Pro bundle:** https://digitalexpress77.gumroad.com/l/ioqrnn (£47 early-bird, lifetime updates)
 
 Personal-use commercial licence. Not resellable.
 
