@@ -7,6 +7,7 @@ const path = require('path');
 const { randomUUID } = require('crypto');
 const { spawn } = require('child_process');
 const { chooseScenesForSentences } = require('./script-scenes-ai');
+const moods = require('./moods');
 
 const PROJECT_ROOT = path.join(__dirname, '..', '..');
 const PUBLIC_DIR = path.join(PROJECT_ROOT, 'public');
@@ -88,7 +89,7 @@ function probeDurationSeconds(audioPath) {
   });
 }
 
-async function buildScenes({ script, voiceId, style }) {
+async function buildScenes({ script, voiceId, style, moodId }) {
   if (!fs.existsSync(VO_DIR)) fs.mkdirSync(VO_DIR, { recursive: true });
   const sentences = splitSentences(script);
   if (!sentences.length) throw new Error('script is empty after sentence split');
@@ -96,8 +97,11 @@ async function buildScenes({ script, voiceId, style }) {
   const batchDir = path.join(VO_DIR, runId);
   fs.mkdirSync(batchDir, { recursive: true });
 
-  // Pick a block + props for each sentence (AI or preset rotation).
-  const picks = await chooseScenesForSentences({ sentences, style });
+  // A mood overrides style entirely.
+  const mood = moodId ? moods.get(moodId) : null;
+  const picks = mood
+    ? moods.applyMoodToSentences({ sentences, mood })
+    : await chooseScenesForSentences({ sentences, style });
 
   const scenes = [];
   for (let i = 0; i < sentences.length; i++) {
@@ -108,16 +112,21 @@ async function buildScenes({ script, voiceId, style }) {
     const durationInFrames = Math.round((seconds + 0.4) * 30);
     const relativeAudio = path.posix.join('script-vo', runId, `${String(i).padStart(3, '0')}.mp3`);
     const pick = picks[i] || {};
+    // Apply mood pacing if set: >1 slower, <1 snappier (shorter holds).
+    const pacing = mood ? mood.pacing : 1;
+    const scaledDuration = Math.round(durationInFrames * pacing);
     scenes.push({
       text,
       audio: relativeAudio,
-      durationInFrames,
+      durationInFrames: scaledDuration,
       block: pick.block || 'BigHeadline',
-      blockProps: pick.blockProps || {}
+      blockProps: pick.blockProps || {},
+      bg: mood ? mood.bgBlock : undefined,
+      bgProps: mood ? mood.bgProps : undefined
     });
   }
   const totalFrames = scenes.reduce((sum, s) => sum + s.durationInFrames, 0);
-  return { runId, scenes, totalFrames };
+  return { runId, scenes, totalFrames, mood: mood ? { id: mood.id, name: mood.name } : null };
 }
 
 module.exports = { buildScenes, splitSentences };

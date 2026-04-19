@@ -30,13 +30,67 @@ async function init() {
   wireAIStudio();
   wireCleanup();
   wireScriptToVideo();
+  wireMoodLibrary();
   pollThumbnails();
   checkSetup();
+}
+
+function wireMoodLibrary() {
+  // Nav wiring already handled by wireNav; we populate on show.
+}
+
+async function loadMoods() {
+  const grid = document.getElementById('moodsGrid');
+  if (!grid) return;
+  grid.innerHTML = '<div style="color:var(--muted);padding:20px">Loading moods…</div>';
+  try {
+    const res = await fetch('/api/moods');
+    const moods = await res.json();
+    grid.innerHTML = moods.map(m => {
+      const [c1, c2, c3] = [m.palette.bg1, m.palette.accent, m.palette.text];
+      return `
+        <div class="mood-card" data-mood-id="${escapeAttr(m.id)}" style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px;cursor:pointer;transition:border-color 0.15s;display:flex;flex-direction:column;gap:10px">
+          <div style="height:90px;border-radius:8px;background:linear-gradient(135deg, ${escapeAttr(c1)} 0%, ${escapeAttr(c2)} 60%, ${escapeAttr(c3)} 100%);position:relative;overflow:hidden">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:Inter,sans-serif;font-weight:900;font-size:28px;color:${escapeAttr(m.palette.text)};letter-spacing:-0.04em;text-shadow:0 2px 8px rgba(0,0,0,0.4)">${escapeHtml(m.name.split(' ')[0])}</div>
+          </div>
+          <div>
+            <div style="font-size:15px;font-weight:700;margin-bottom:4px">${escapeHtml(m.name)}</div>
+            <div style="font-size:11px;color:var(--muted);line-height:1.4;min-height:45px">${escapeHtml(m.description)}</div>
+          </div>
+          <button class="btn primary mood-apply" data-id="${escapeAttr(m.id)}" data-name="${escapeAttr(m.name)}" style="width:100%">Apply to Script →</button>
+        </div>`;
+    }).join('');
+    grid.querySelectorAll('.mood-apply').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        applyMoodToScript(btn.getAttribute('data-id'), btn.getAttribute('data-name'));
+      });
+    });
+  } catch (err) {
+    grid.innerHTML = `<div style="color:var(--danger);padding:20px">Failed to load moods: ${escapeHtml(err.message)}</div>`;
+  }
+}
+
+function applyMoodToScript(id, name) {
+  state.scriptMoodId = id;
+  const bar = document.getElementById('scriptMoodBar');
+  const nameEl = document.getElementById('scriptMoodName');
+  if (bar) bar.style.display = 'flex';
+  if (nameEl) nameEl.textContent = name;
+  document.querySelector('.nav-item[data-view="script"]').click();
+}
+
+function clearScriptMood() {
+  state.scriptMoodId = null;
+  const bar = document.getElementById('scriptMoodBar');
+  if (bar) bar.style.display = 'none';
 }
 
 function wireScriptToVideo() {
   const btn = document.getElementById('scriptBuildBtn');
   if (!btn) return;
+  const clearMoodBtn = document.getElementById('scriptMoodClear');
+  if (clearMoodBtn) clearMoodBtn.addEventListener('click', clearScriptMood);
   btn.addEventListener('click', async () => {
     const script = document.getElementById('scriptInput').value.trim();
     if (script.length < 20) return alert('Script too short — paste at least a few sentences.');
@@ -46,7 +100,8 @@ function wireScriptToVideo() {
       fontSize: parseInt(document.getElementById('scriptFontSize').value, 10) || 140,
       textColor: document.getElementById('scriptTextColor').value,
       bgColors: [document.getElementById('scriptBg1').value, document.getElementById('scriptBg2').value],
-      style: document.getElementById('scriptStyle').value
+      style: document.getElementById('scriptStyle').value,
+      moodId: state.scriptMoodId || undefined
     };
     const panel = document.getElementById('scriptProgress');
     const result = document.getElementById('scriptResult');
@@ -1464,6 +1519,7 @@ function wireNav() {
       if (view === 'daily') renderDailyTemplates();
       if (view === 'timeline') { renderTimelineLibrary(); renderTimelineUI(); refreshProjectPicker(); }
       if (view === 'maintenance') loadCleanupStatus();
+      if (view === 'moods') loadMoods();
     });
   });
 }

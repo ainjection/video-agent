@@ -28,6 +28,7 @@ const uploadBlotato = require('./lib/upload-blotato');
 const uploadCatbox = require('./lib/upload-catbox');
 const subtitles = require('./lib/subtitles');
 const scriptToVideo = require('./lib/script-to-video');
+const moods = require('./lib/moods');
 const IMAGES_DIR = path.join(__dirname, 'data', 'images');
 const REMOTION_IMAGES_DIR = path.join(__dirname, '..', 'public', 'images');
 const AUDIO_DIR = path.join(__dirname, 'data', 'audio');
@@ -97,13 +98,19 @@ const server = http.createServer((req, res) => {
     }
   }
 
+  // Mood Library — 12 curated visual styles. Each locks in palette,
+  // block rotation, background, and pacing for a whole video.
+  if (pathname === '/api/moods' && req.method === 'GET') {
+    return send(res, 200, moods.list());
+  }
+
   // Script-to-video: sentence-by-sentence VO + block scenes → render.
   if (pathname === '/api/script/build' && req.method === 'POST') {
     return readBody(req, async (body) => {
       try {
-        const { script, voiceId, fontSize, textColor, bgColors, style } = JSON.parse(body || '{}');
+        const { script, voiceId, fontSize, textColor, bgColors, style, moodId } = JSON.parse(body || '{}');
         if (!script || script.trim().length < 20) return send(res, 400, { error: 'script too short' });
-        const built = await scriptToVideo.buildScenes({ script, voiceId, style });
+        const built = await scriptToVideo.buildScenes({ script, voiceId, style, moodId });
         const render = renderer.startRender({
           compositionId: 'ScriptRunner',
           props: {
