@@ -102,10 +102,12 @@ function showSetupModal(status) {
   const existing = document.getElementById('setupModal');
   if (existing) existing.remove();
   const keys = [
-    { id: 'ANTHROPIC_API_KEY', label: 'Anthropic (Claude)', href: 'https://console.anthropic.com/' },
-    { id: 'GEMINI_API_KEY', label: 'Google Gemini', href: 'https://aistudio.google.com/apikey' },
-    { id: 'ELEVEN_API_KEY', label: 'ElevenLabs (voiceover)', href: 'https://elevenlabs.io/app/settings/api-keys' }
+    { id: 'ANTHROPIC_API_KEY', label: 'Anthropic (Claude)', href: 'https://console.anthropic.com/', required: true },
+    { id: 'GEMINI_API_KEY', label: 'Google Gemini', href: 'https://aistudio.google.com/apikey', required: true },
+    { id: 'ELEVEN_API_KEY', label: 'ElevenLabs (voiceover)', href: 'https://elevenlabs.io/app/settings/api-keys', required: true },
+    { id: 'BLOTATO_API_KEY', label: 'Blotato (social publishing — optional)', href: 'https://my.blotato.com/settings/api', required: false }
   ];
+  const presentSet = new Set([...(status.present || []), ...(status.optionalPresent || [])]);
   const modal = document.createElement('div');
   modal.id = 'setupModal';
   modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(6px)';
@@ -118,10 +120,10 @@ function showSetupModal(status) {
         ${keys.map(k => `
           <label style="display:block">
             <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
-              <span style="font-weight:600">${k.label} ${status.present.includes(k.id) ? '<span style="color:var(--accent);font-size:10px;letter-spacing:0.15em">✓ SET</span>' : ''}</span>
+              <span style="font-weight:600">${k.label} ${presentSet.has(k.id) ? '<span style="color:var(--accent);font-size:10px;letter-spacing:0.15em">✓ SET</span>' : ''}</span>
               <a href="${k.href}" target="_blank" style="font-size:11px;color:var(--muted)">get a key →</a>
             </div>
-            <input name="${k.id}" type="password" placeholder="${status.present.includes(k.id) ? '(already set — leave blank to keep)' : 'paste key'}" style="width:100%;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-family:monospace;font-size:12px">
+            <input name="${k.id}" type="password" placeholder="${presentSet.has(k.id) ? '(already set — leave blank to keep)' : 'paste key'}" style="width:100%;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-family:monospace;font-size:12px">
           </label>
         `).join('')}
         <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
@@ -2299,7 +2301,10 @@ async function showUploadModal(filename, label) {
   const statusRes = await fetch('/api/upload/status');
   const { configured } = await statusRes.json();
   if (!configured) {
-    alert('Set BLOTATO_API_KEY in your .env first, then reload the dashboard.');
+    if (confirm('Blotato API key not set. Open the setup panel to add it now?')) {
+      const s = await fetch('/api/setup/status').then(r => r.json());
+      showSetupModal(s);
+    }
     return;
   }
 

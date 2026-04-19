@@ -3,6 +3,8 @@ const path = require('path');
 
 const ENV_FILE = path.join(__dirname, '..', '..', '.env');
 const REQUIRED_KEYS = ['ANTHROPIC_API_KEY', 'GEMINI_API_KEY', 'ELEVEN_API_KEY'];
+const OPTIONAL_KEYS = ['BLOTATO_API_KEY'];
+const ALL_KEYS = [...REQUIRED_KEYS, ...OPTIONAL_KEYS];
 
 function readEnvFile() {
   if (!fs.existsSync(ENV_FILE)) return {};
@@ -16,11 +18,16 @@ function readEnvFile() {
 
 function getStatus() {
   const env = readEnvFile();
-  const status = { envFileExists: fs.existsSync(ENV_FILE), missing: [], present: [] };
+  const status = { envFileExists: fs.existsSync(ENV_FILE), missing: [], present: [], optionalPresent: [], optionalMissing: [] };
   for (const key of REQUIRED_KEYS) {
     const v = env[key] || process.env[key];
     if (v && v.length > 10) status.present.push(key);
     else status.missing.push(key);
+  }
+  for (const key of OPTIONAL_KEYS) {
+    const v = env[key] || process.env[key];
+    if (v && v.length > 10) status.optionalPresent.push(key);
+    else status.optionalMissing.push(key);
   }
   status.complete = status.missing.length === 0;
   return status;
@@ -29,7 +36,7 @@ function getStatus() {
 function saveKeys(updates) {
   const env = readEnvFile();
   for (const [key, value] of Object.entries(updates || {})) {
-    if (!REQUIRED_KEYS.includes(key)) continue;
+    if (!ALL_KEYS.includes(key)) continue;
     if (typeof value !== 'string') continue;
     const clean = value.trim();
     if (clean) env[key] = clean;
@@ -41,4 +48,4 @@ function saveKeys(updates) {
   return getStatus();
 }
 
-module.exports = { getStatus, saveKeys, REQUIRED_KEYS };
+module.exports = { getStatus, saveKeys, REQUIRED_KEYS, OPTIONAL_KEYS };
