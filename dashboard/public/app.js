@@ -32,8 +32,79 @@ async function init() {
   wireScriptToVideo();
   wireMoodLibrary();
   wireVisualBrief();
+  wireAutoEdit();
   pollThumbnails();
   checkSetup();
+}
+
+function wireAutoEdit() {
+  const btn = document.getElementById('aeStart');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    const inputPath = document.getElementById('aeInput').value.trim();
+    if (!inputPath) return alert('Paste a path to a raw MP4 first.');
+    const body = {
+      inputPath,
+      outputName: document.getElementById('aeOutput').value.trim() || undefined,
+      options: {
+        doFillers: document.getElementById('aeFillers').checked,
+        doAiCuts: document.getElementById('aeAi').checked,
+        doSilence: document.getElementById('aeSilence').checked,
+        doCaptions: document.getElementById('aeCaptions').checked,
+        doAudioPolish: document.getElementById('aeAudio').checked,
+        silenceGapSeconds: parseFloat(document.getElementById('aeSilenceGap').value) || 1.2
+      }
+    };
+    const panel = document.getElementById('aeProgress');
+    const result = document.getElementById('aeResult');
+    panel.style.display = 'block';
+    document.getElementById('aeStage').textContent = 'queuing…';
+    document.getElementById('aeFill').style.width = '0%';
+    document.getElementById('aePct').textContent = '0%';
+    document.getElementById('aeLog').textContent = '';
+    result.innerHTML = '';
+    btn.disabled = true;
+    try {
+      const res = await fetch('/api/auto-edit/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'start failed');
+      const es = new EventSource(`/api/auto-edit/progress/${data.jobId}`);
+      es.onmessage = (evt) => {
+        const d = JSON.parse(evt.data);
+        document.getElementById('aeStage').textContent = d.stage || 'working…';
+        const pct = d.progress || 0;
+        document.getElementById('aeFill').style.width = pct + '%';
+        document.getElementById('aePct').textContent = pct + '%';
+        if (d.log) document.getElementById('aeLog').textContent = d.log;
+        if (d.status === 'done' && d.result) {
+          es.close();
+          const r = d.result;
+          result.innerHTML = `
+            <div class="muted" style="font-size:11px;margin-bottom:6px">Output: <code>out/${escapeHtml(r.outputName)}</code> · ${(r.sizeBytes/1024/1024).toFixed(1)} MB · trimmed <b>${r.trimmedPct}%</b> of original (${r.originalSeconds.toFixed(1)}s → ${r.durationSeconds.toFixed(1)}s)</div>
+            <video src="/out/${encodeURIComponent(r.outputName)}" controls autoplay style="width:100%;border-radius:8px;background:#000;margin-top:6px"></video>
+            <details style="margin-top:10px;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:10px 14px">
+              <summary style="cursor:pointer;font-size:12px;color:var(--muted)">Cut list (${(r.cuts || []).length} removed ranges)</summary>
+              <table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:8px;font-family:monospace">
+                ${(r.cuts || []).slice(0, 120).map(c => `<tr><td style="padding:2px 8px;color:var(--muted)">${c.start.toFixed(2)}s–${c.end.toFixed(2)}s</td><td style="padding:2px 8px">${escapeHtml(c.reason)}</td></tr>`).join('')}
+              </table>
+            </details>`;
+          btn.disabled = false;
+        } else if (d.status === 'failed') {
+          es.close();
+          result.innerHTML = `<div style="padding:12px;background:rgba(239,68,68,0.1);border:1px solid #ef4444;border-radius:6px;color:#ef4444;font-family:monospace;font-size:12px">${escapeHtml(d.error || 'failed')}</div>`;
+          btn.disabled = false;
+        }
+      };
+      es.onerror = () => { es.close(); btn.disabled = false; };
+    } catch (err) {
+      document.getElementById('aeLog').textContent = '✗ ' + err.message;
+      btn.disabled = false;
+    }
+  });
 }
 
 async function loadHeroLibrary() {

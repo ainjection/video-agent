@@ -51,6 +51,9 @@
         <button class="nav-item" data-view="hero">
           <span class="nav-icon">🦸</span> Hero Library
         </button>
+        <button class="nav-item" data-view="autoedit">
+          <span class="nav-icon">🎬</span> Auto-Edit
+        </button>
         <button class="nav-item" data-view="daily">
           <span class="nav-icon">🤖</span> Daily Render
         </button>
@@ -310,6 +313,42 @@
           </div>
 
           <div id="importStatus" class="import-status"></div>
+        </div>
+      </section>
+
+      <!-- AUTO-EDIT -->
+      <section class="view hidden" data-view="autoedit">
+        <header class="view-header">
+          <h1>Auto-Edit</h1>
+          <div class="muted">Drop a raw talking-head MP4 path below. Transcribe → remove filler words + AI-detected retakes + long silences → burn captions → loudnorm audio → finished MP4.</div>
+        </header>
+        <div class="import-form">
+          <label class="full"><span>Input MP4 path (absolute, e.g. <code>C:\Users\clawb\Videos\raw.mp4</code> or <code>out/render.mp4</code>)</span>
+            <input id="aeInput" type="text" placeholder="C:\path\to\raw.mp4">
+          </label>
+          <div class="import-fields">
+            <label><span>Output filename</span><input id="aeOutput" type="text" placeholder="auto-edit.mp4"></label>
+            <label><span>Silence gap (seconds, cut anything longer)</span><input id="aeSilenceGap" type="number" step="0.1" min="0.6" max="5" value="1.2"></label>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:14px;margin:10px 0 16px 0;font-size:12px">
+            <label><input type="checkbox" id="aeFillers" checked> Remove filler words (um/uh/like/…)</label>
+            <label><input type="checkbox" id="aeAi" checked> AI cuts (Claude — retakes/false starts)</label>
+            <label><input type="checkbox" id="aeSilence" checked> Trim long silences</label>
+            <label><input type="checkbox" id="aeCaptions" checked> Burn captions</label>
+            <label><input type="checkbox" id="aeAudio" checked> Audio polish (loudnorm + compressor)</label>
+          </div>
+          <div class="actions">
+            <button id="aeStart" class="btn primary">▶ Run Auto-Edit</button>
+          </div>
+          <div id="aeProgress" class="progress-panel" style="margin-top:14px;display:none">
+            <div class="progress-header">
+              <span id="aeStage">preparing…</span>
+              <span id="aePct">0%</span>
+            </div>
+            <div class="progress-bar"><div id="aeFill" style="width:0%"></div></div>
+            <div class="progress-line" id="aeLog">—</div>
+          </div>
+          <div id="aeResult" style="margin-top:14px"></div>
         </div>
       </section>
 

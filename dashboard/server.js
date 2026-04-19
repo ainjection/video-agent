@@ -32,6 +32,7 @@ const scriptToVideo = require('./lib/script-to-video');
 const moods = require('./lib/moods');
 const visualBrief = require('./lib/visual-brief');
 const heroLibrary = require('./lib/hero-library');
+const autoEdit = require('./lib/auto-edit');
 const IMAGES_DIR = path.join(__dirname, 'data', 'images');
 const REMOTION_IMAGES_DIR = path.join(__dirname, '..', 'public', 'images');
 const AUDIO_DIR = path.join(__dirname, 'data', 'audio');
@@ -99,6 +100,48 @@ const server = http.createServer((req, res) => {
     } catch (err) {
       return send(res, 500, { error: err.message });
     }
+  }
+
+  // Auto-Edit — transcribe raw MP4, remove fillers/retakes/silences,
+  // burn captions, polish audio, output finished MP4.
+  if (pathname === '/api/auto-edit/start' && req.method === 'POST') {
+    return readBody(req, (body) => {
+      try {
+        const { inputPath, outputName, options } = JSON.parse(body || '{}');
+        if (!inputPath) return send(res, 400, { error: 'inputPath required' });
+        const resolvedInput = path.isAbsolute(inputPath) ? inputPath : path.join(__dirname, '..', inputPath);
+        if (!fs.existsSync(resolvedInput)) return send(res, 404, { error: 'input file not found' });
+        const { jobId } = autoEdit.autoEdit({ inputPath: resolvedInput, outputName, options });
+        send(res, 200, { ok: true, jobId });
+      } catch (err) {
+        send(res, 400, { error: err.message });
+      }
+    });
+  }
+  if (/^\/api\/auto-edit\/progress\/[^/]+$/.test(pathname) && req.method === 'GET') {
+    const jobId = decodeURIComponent(pathname.split('/').pop());
+    const job = autoEdit.getJob(jobId);
+    if (!job) return send(res, 404, { error: 'job not found' });
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive'
+    });
+    const write = (state) => {
+      const payload = {
+        status: state.status,
+        stage: state.stage,
+        progress: state.progress,
+        log: state.log,
+        result: state.result,
+        error: state.error
+      };
+      res.write(`data: ${JSON.stringify(payload)}\n\n`);
+      if (state.status === 'done' || state.status === 'failed') res.end();
+    };
+    const unsub = autoEdit.subscribe(jobId, write);
+    req.on('close', unsub);
+    return;
   }
 
   // Hero Library — pre-rendered MP4 clips (Blender / AI video gen) that
