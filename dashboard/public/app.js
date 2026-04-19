@@ -1882,6 +1882,7 @@ async function selectComposition(id) {
         <button class="btn" id="aiThumbBtn" title="Generate AI thumbnail with Nano Banana">🎨 AI Thumb</button>
         <button class="btn" id="forkBtn" title="Duplicate this composition with a new id">⎘ Fork</button>
         <button class="btn" id="saveVariantBtn">💾 Save Variant</button>
+        <button class="btn danger" id="deleteBtn" title="Remove this composition from the library (source files are kept)">🗑 Delete</button>
         <button class="btn primary" id="renderBtn">▶ Render</button>
       </div>
     </div>
@@ -1923,6 +1924,8 @@ async function selectComposition(id) {
   if (aiThumbBtn) aiThumbBtn.addEventListener('click', () => generateAiThumbnail(comp));
   const editAiBtn = document.getElementById('editAiBtn');
   if (editAiBtn) editAiBtn.addEventListener('click', () => editWithAI(comp));
+  const deleteBtn = document.getElementById('deleteBtn');
+  if (deleteBtn) deleteBtn.addEventListener('click', () => deleteCompositionPrompt(comp));
 
   // Live preview: when the form changes in Live Studio mode, push the new
   // values into Root.tsx's defaultProps for this composition. Remotion
@@ -2201,6 +2204,23 @@ function collectPropsFromForm() {
     props[key] = v;
   });
   return props;
+}
+
+async function deleteCompositionPrompt(comp) {
+  const msg = `Remove "${comp.id}" from the library?\n\nThis only unregisters the composition. Source files (.tsx / MP4) stay on disk so you can re-add it manually if you change your mind.`;
+  if (!confirm(msg)) return;
+  try {
+    const res = await fetch(`/api/compositions/${encodeURIComponent(comp.id)}/delete`, { method: 'POST' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'delete failed');
+    await loadCompositions();
+    await loadCategories();
+    renderLibrary();
+    renderCategoryTabs();
+    document.querySelector('.nav-item[data-view="library"]').click();
+  } catch (err) {
+    alert('Delete failed: ' + err.message);
+  }
 }
 
 async function editWithAI(comp) {

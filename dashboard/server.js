@@ -22,6 +22,7 @@ const cleanup = require('./lib/cleanup');
 const schemasDb = require('./lib/schemas');
 const liveProps = require('./lib/live-props');
 const fork = require('./lib/fork');
+const deleteComposition = require('./lib/delete-composition');
 const setup = require('./lib/setup');
 const aiThumbnail = require('./lib/ai-thumbnail');
 const uploadBlotato = require('./lib/upload-blotato');
@@ -300,6 +301,20 @@ const server = http.createServer((req, res) => {
         send(res, 400, { error: err.message });
       }
     });
+  }
+
+  // Delete a composition's registration from wherever it lives (Root.tsx,
+  // blocks/register.tsx, or hero-library/manifest.json). Source files
+  // (.tsx / .mp4) are left on disk — only the composition entry is
+  // removed so it stops showing in the library.
+  if (/^\/api\/compositions\/[^/]+\/delete$/.test(pathname) && req.method === 'POST') {
+    const compId = decodeURIComponent(pathname.split('/')[3]);
+    try {
+      const result = deleteComposition.deleteComposition(compId);
+      return send(res, 200, { ok: true, ...result });
+    } catch (err) {
+      return send(res, 400, { error: err.message });
+    }
   }
 
   // Fork a composition — duplicate its registration with a new id so you
