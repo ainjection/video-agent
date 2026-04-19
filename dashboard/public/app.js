@@ -2108,9 +2108,9 @@ async function forkComposition(comp) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'fork failed');
     await loadCompositions();
+    renderLibrary();
     alert(`Forked → ${data.id}`);
-    const forked = state.compositions.find(c => c.id === data.id);
-    if (forked) showCompositionDetail(forked);
+    selectComposition(data.id);
   } catch (err) {
     alert('Fork failed: ' + err.message);
   }
